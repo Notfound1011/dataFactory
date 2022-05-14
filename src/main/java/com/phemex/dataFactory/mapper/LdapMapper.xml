@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.phemex.dataFactory.mapper.LdapMapper">
+    <resultMap id="BaseResultMap" type="com.phemex.dataFactory.dto.LdapUserDTO">
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="user" jdbcType="VARCHAR" property="user"/>
+        <result column="group" jdbcType="VARCHAR" property="group"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="update_time" jdbcType="BIGINT" property="updateTime"/>
+    </resultMap>
+    <select id="select" parameterType="com.phemex.dataFactory.dto.LdapUserDTO" resultMap="BaseResultMap">
+        select * from ldap_user
+    </select>
+    <select id="countByUser" parameterType="com.phemex.dataFactory.dto.LdapUserDTO" resultMap="BaseResultMap">
+        select count(*)  from ldap_user where user = #{user,jdbcType=VARCHAR}
+    </select>
+    <insert id="insert" parameterType="com.phemex.dataFactory.dto.LdapUserDTO">
+        insert into ldap_user (id, `user`, `group`, create_time, update_time)
+        values (#{id,jdbcType=VARCHAR}, #{user,jdbcType=VARCHAR}, #{group,jdbcType=VARCHAR},
+                #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT})
+    </insert>
+    <update id="updateByUser" parameterType="com.phemex.dataFactory.dto.LdapUserDTO">
+        update ldap_user
+        set `group` = #{group,jdbcType=VARCHAR},
+            update_time = #{updateTime,jdbcType=BIGINT}
+        where user = #{user,jdbcType=VARCHAR}
+    </update>
+</mapper>

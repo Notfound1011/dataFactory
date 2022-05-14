@@ -1,4 +1,4 @@
-package com.phemex.dataGalaxy.common.utils;
+package com.phemex.dataFactory.common.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

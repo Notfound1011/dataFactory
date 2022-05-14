@@ -1,4 +1,4 @@
-package com.phemex.dataGalaxy.common.utils;
+package com.phemex.dataFactory.common.utils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -95,6 +95,35 @@ public class HttpClientUtil {
 
 
     /**
+     * Description: httpGet请求
+     *
+     * @param url     路径
+     * @param headers 请求头信息
+     * @return CloseableHttpResponse
+     */
+    public static CloseableHttpResponse httpGet(String url, Map<String, String> headers) throws Exception {
+        CloseableHttpClient httpClient = null;
+        HttpGet httpGet;
+        CloseableHttpResponse httpResponse = null;
+        String result;
+        try {
+            httpClient = HttpClientBuilder.create().build();
+
+            httpGet = new HttpGet(url);
+            //设置请求头
+            setHeader(headers, httpGet);
+            RequestConfig config = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
+            httpGet.setConfig(config);
+            httpResponse = httpClient.execute(httpGet);
+//            result = getHttpClientResult(httpResponse, httpClient, httpGet);
+        } finally {
+            release(httpResponse, httpClient);
+        }
+        return httpResponse;
+    }
+
+
+    /**
      * Description: post请求
      *
      * @param url     路径
@@ -119,6 +148,7 @@ public class HttpClientUtil {
             httpPost.setConfig(config);
 
             result = getHttpClientResult(httpResponse, httpClient, httpPost);
+//            httpResponse = httpClient.execute(httpPost);
         } finally {
             release(httpResponse, httpClient);
         }

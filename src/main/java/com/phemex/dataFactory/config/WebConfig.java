@@ -1,6 +1,6 @@
-package com.phemex.dataGalaxy.config;
+package com.phemex.dataFactory.config;
 
-import com.phemex.dataGalaxy.common.utils.LogUtil;
+import com.phemex.dataFactory.common.utils.LogUtil;
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.HttpClientBuilder;

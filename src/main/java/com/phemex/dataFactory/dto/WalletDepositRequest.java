@@ -1,4 +1,4 @@
-package com.phemex.dataGalaxy.dto;
+package com.phemex.dataFactory.dto;
 
 import lombok.Getter;
 import lombok.Setter;

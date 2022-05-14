@@ -1,8 +1,8 @@
-package com.phemex.dataGalaxy.controller;
+package com.phemex.dataFactory.controller;
 
-import com.phemex.dataGalaxy.common.utils.*;
+import com.phemex.dataFactory.common.utils.*;
 import org.springframework.web.bind.annotation.*;
-import com.phemex.dataGalaxy.dto.*;
+import com.phemex.dataFactory.dto.*;
 
 /**
  * @author: yuyu.shi
@@ -14,7 +14,7 @@ import com.phemex.dataGalaxy.dto.*;
 @RequestMapping("wallet")
 public class WalletController {
 
-    @PostMapping("deposit")
+    @PostMapping("/deposit")
     public String walletDeposit(@RequestBody WalletDepositRequest walletDepositRequest) {
         try {
             String baseUrl = walletDepositRequest.getHost() + walletDepositRequest.getPath();
