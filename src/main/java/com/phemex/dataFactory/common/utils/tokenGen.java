@@ -46,7 +46,7 @@ public class tokenGen {
             String url = "http://internal-alb-internal-sp-nginx-qa2-124215266.ap-southeast-1.elb.amazonaws.com/api/phemex-user/users/confirm/login" + "?code=" + code + "&mailCode=111111";
             CloseableHttpResponse res2 = HttpClientUtil.httpGet(url, header);
             String responseHeader = res2.getFirstHeader("phemex-auth-token").getValue();
-            LogUtil.info(responseHeader);
+            System.out.println(responseHeader);
             strBuffer.append(str).append(",").append(responseHeader);
             strBuffer.append("\n");//行与行之间的分割
         }
