@@ -39,11 +39,11 @@ public class tokenGen {
             body.put("password", "Shiyu@123");
             body.put("encryptVersion", 0);
             JSONObject jsonObj = new JSONObject(body);
-            String res = HttpClientUtil.jsonPost("https://qa2.phemex.com/api/phemex-user/users/login", jsonObj.toString(), header);
+            String res = HttpClientUtil.jsonPost("http://internal-alb-internal-sp-nginx-qa2-124215266.ap-southeast-1.elb.amazonaws.com/api/phemex-user/users/login", jsonObj.toString(), header);
             JSONObject json_res = (JSONObject) JSONObject.parse(res);
             String code = (String) json_res.getJSONObject("data").get("code");
 
-            String url = "https://qa2.phemex.com/api/phemex-user/users/confirm/login" + "?code=" + code + "&mailCode=111111";
+            String url = "http://internal-alb-internal-sp-nginx-qa2-124215266.ap-southeast-1.elb.amazonaws.com/api/phemex-user/users/confirm/login" + "?code=" + code + "&mailCode=111111";
             CloseableHttpResponse res2 = HttpClientUtil.httpGet(url, header);
             String responseHeader = res2.getFirstHeader("phemex-auth-token").getValue();
             LogUtil.info(responseHeader);
