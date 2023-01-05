@@ -20,7 +20,7 @@ public interface LdapMapper {
 
     int updateByUser(LdapUserDTO ldapUserDTO);
 
-    Integer countByUser(String user);
+    Integer countByUser(@Param("user") String user);
 
-    List<LdapUserDTO> select();
+    List<LdapUserDTO> selectAll();
 }

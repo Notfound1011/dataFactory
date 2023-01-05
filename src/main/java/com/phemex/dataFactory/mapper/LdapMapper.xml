@@ -8,11 +8,11 @@
         <result column="create_time" jdbcType="BIGINT" property="createTime"/>
         <result column="update_time" jdbcType="BIGINT" property="updateTime"/>
     </resultMap>
-    <select id="select" parameterType="com.phemex.dataFactory.dto.LdapUserDTO" resultMap="BaseResultMap">
+    <select id="selectAll" parameterType="com.phemex.dataFactory.dto.LdapUserDTO" resultMap="BaseResultMap">
         select * from ldap_user
     </select>
-    <select id="countByUser" parameterType="com.phemex.dataFactory.dto.LdapUserDTO" resultMap="BaseResultMap">
-        select count(*)  from ldap_user where user = #{user,jdbcType=VARCHAR}
+    <select id="countByUser" parameterType="com.phemex.dataFactory.dto.LdapUserDTO" resultType="java.lang.Integer">
+        select count(*)  from ldap_user where `user` = #{user,jdbcType=VARCHAR}
     </select>
     <insert id="insert" parameterType="com.phemex.dataFactory.dto.LdapUserDTO">
         insert into ldap_user (id, `user`, `group`, create_time, update_time)

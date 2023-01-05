@@ -21,7 +21,7 @@ public class LdapProperties {
 
     private String searchBase = "cn=users,dc=cmex,dc=corp";
 
-    private String[] groupFilter = {"confluence-users", "DEV", "Cd", "Dev", "Users", "Domain Admins", "RedisData", "CBT", "Admin", "Infra"};
+    private String[] groupFilter = {"confluence-users", "confluence-administrators", "DEV", "Cd", "Dev", "Users", "Domain Admins", "RedisData", "CBT", "Admin", "Infra"};
 
     private String[] returningAttributes = {"memberOf", "url", "whenChanged", "employeeID", "name", "userPrincipalName", "physicalDeliveryOfficeName", "departmentNumber", "telephoneNumber", "homePhone", "mobile", "department", "sAMAccountName", "whenChanged", "mail"};
 

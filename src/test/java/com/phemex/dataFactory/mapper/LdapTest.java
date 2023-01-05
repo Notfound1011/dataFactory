@@ -5,6 +5,7 @@ import com.phemex.dataFactory.common.utils.LogUtil;
 import com.phemex.dataFactory.dto.LdapUserDTO;
 import com.phemex.dataFactory.mapper.LdapMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,17 +77,16 @@ public class LdapTest {
     @Test
     public void testGet() {
         //5、调用方法
-        List<LdapUserDTO> aa = ldapMapper.select();
+        List<LdapUserDTO> aa = ldapMapper.selectAll();
+        System.out.println(aa);
         LogUtil.info(aa);
     }
 
     @Test
     public void testCount() {
+        System.out.println("testCount");
         //5、调用方法
-        ldapMapper.countByUser("yuyu.shi");
-
-        LogUtil.info("====================");
-        LogUtil.info(ldapMapper.countByUser("yuyu.shi"));
+        int a = ldapMapper.countByUser("yuyu.shi");
+        Assert.assertEquals(a, 1);
     }
-
 }

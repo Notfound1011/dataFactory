@@ -9,26 +9,42 @@ package com.phemex.dataFactory.common.utils;
  */
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 
 public class SqlGen {
 
     public static void main(String[] args) throws Exception {
-        String baseSql = "INSERT INTO `phemex_privilege`.`marketing_privilege_7` (`id`, `privilege_id`, `create_time`, `update_time`, `uid`, `activity_id`, `template_id`, `qualification_id`, `name`, `body`, `status`, `reason`, `type`, `extra`, `start_time`, `end_time`, `reference_id`) " +
-                "VALUES (%d, '%s', '2022-05-07 07:31:27.535', '2022-05-07 07:31:27.000', 200707, 1, 158, NULL, 'Zero Trading Fees for Web and App (Monthly limit:$5,000)', '{\\\"limit\\\":null,\\\"dayLimit\\\":null,\\\"monthLimit\\\":500000000000}', 3, NULL, 'SPOT_FREE_CARD', '{\\\"currentLevel\\\":\\\"3\\\",\\\"createTime\\\":\\\"1651908686079\\\",\\\"userLevelEventType\\\":\\\"MEMBERSHIP_ASSIGN\\\",\\\"beforeLevel\\\":\\\"1\\\"}', '2022-05-07 07:31:27.532', '2022-08-06 07:31:27.532', NULL);";
+        String baseSql = "INSERT INTO `phemex_user`.`t_user_levels_%d` (`user_id`, `create_time`, `update_time`, `current_level`, `effective_level`, `proper_level`, `growth_value`, `validation_start`, `validation_end`, `origin_level_id`, `origin_level_type`, `hist_id`) VALUES (%d, '%s', '%s', 6, 6, 1, 60, '2022-05-12 00:00:00', '2022-08-10 00:00:00', 1524700455860555777, 1, 1524700455923470338);";
+        String inputFilePath = "src/main/resources/input/userId.csv";
+        String outputFilePath = "src/main/resources/output/test.sql";
+        generateSql(baseSql, inputFilePath, outputFilePath);
+    }
 
-        File file = new File("./test.sql");
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
-        FileWriter fileWriter = new FileWriter(file);
-        for (int i = 0; i < 10; i++) {
-            fileWriter.write(String.format(baseSql, i + 1, "sss") + "\n");
-            fileWriter.flush();
+    /**
+     * @Description: 读取inputFile中的uid，结合基础SQL语句baseSql，生成sql语句输出到outputFile
+     * @Date: 2022/6/8
+     * @Param baseSql: 基准sql语句
+     * @Param inputFilePath: 输入文件
+     * @Param outputFilePath: 输出文件
+     **/
+    private static void generateSql(String baseSql, String inputFilePath, String outputFilePath) throws IOException {
+        BufferedReader bufReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFilePath)));//数据流读取文件
+        StringBuffer strBuffer = new StringBuffer();
+        long times = System.currentTimeMillis();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentTime = formatter.format(times);
+        // UUID.randomUUID().toString().replaceAll("-", "");
+        for (String str; (str = bufReader.readLine()) != null; ) {
+            int uid = Integer.parseInt(str.split(",")[0]);
+            int mod = uid % 10;  //对10取模，分表
+            strBuffer.append(String.format(baseSql, mod, uid, currentTime, currentTime) + "\n");
         }
-        fileWriter.close();
-        System.out.println("完成");
 
-//        UUID.randomUUID().toString().replaceAll("-", "");
-//        SqlGen sqlGen = new SqlGen();
-//        sqlGen.outPutSql("./test.sql", String.format(baseSql, "sss", 123, "aaa", "bbb", 456), 1);
+        bufReader.close();
+        PrintWriter printWriter = new PrintWriter(outputFilePath);//替换后输出的文件位置
+        printWriter.write(strBuffer.toString().toCharArray());
+        printWriter.flush();
+        printWriter.close();
     }
 
     /**
@@ -65,6 +81,26 @@ public class SqlGen {
         fileWriter.flush();
         fileWriter.close();
         System.out.println("完成");
+    }
+
+    /**
+     * @Description: 读取文件
+     * @Date: 2022/5/13
+     * @Param baseFilePath:
+     **/
+    public String readSql(String baseFilePath) throws Exception {
+        File file = new File(baseFilePath);
+        if (file.isFile()) {
+            FileInputStream fileInputStream = new FileInputStream(file);
+            byte[] buf = new byte[1024];
+            StringBuffer stringBuffer = new StringBuffer();
+            int len = 0;
+            while ((len = fileInputStream.read(buf)) != -1) {
+                stringBuffer.append(new String(buf, 0, len, "GBK"));
+            }
+            return stringBuffer.toString();
+        }
+        return null;
     }
 }
 

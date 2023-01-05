@@ -1,6 +1,8 @@
 package com.phemex.dataFactory.controller;
 
 import com.phemex.dataFactory.common.utils.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import com.phemex.dataFactory.dto.*;
 
@@ -10,10 +12,12 @@ import com.phemex.dataFactory.dto.*;
  * @Date: 2022年04月17日 19:30
  * @Description:
  */
+@Api
 @RestController
 @RequestMapping("wallet")
 public class WalletController {
 
+    @ApiOperation(value = "用户充值", notes = "用户充值", httpMethod = "POST")
     @PostMapping("/deposit")
     public String walletDeposit(@RequestBody WalletDepositRequest walletDepositRequest) {
         try {

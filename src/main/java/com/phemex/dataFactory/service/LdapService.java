@@ -4,6 +4,7 @@ import com.phemex.dataFactory.common.utils.LogUtil;
 import com.phemex.dataFactory.config.LdapProperties;
 import com.phemex.dataFactory.dto.LdapUserDTO;
 import com.phemex.dataFactory.mapper.LdapMapper;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -30,7 +31,8 @@ public class LdapService {
     private LdapMapper ldapMapper;
 
     LdapProperties ldapProperties = new LdapProperties();
-    public Object getUsers() {
+
+    public Object getUsers(boolean debug) {
         String adminName = ldapProperties.getAdminName();
         String password = ldapProperties.getPassword();
         String ldapUrl = ldapProperties.getLdapUrl();
@@ -38,7 +40,7 @@ public class LdapService {
         LdapContext ctx = null;
         //1. 设置初始LDAP上下文的属性，并初始化LDAP上下文
         Hashtable<String, String> env = DirContext(adminName, password, ldapUrl);
-        return getUsers(ctx, searchBase, env);
+        return getUsers(ctx, searchBase, env, debug);
     }
 
 //    public void insertUsers() {
@@ -55,13 +57,16 @@ public class LdapService {
 //        ldapMapper.insert(ldapUserDTO);
 //    }
 
-    public List<LdapUserDTO> select(){
-         return ldapMapper.select();
+    public List<LdapUserDTO> selectAll() {
+        return ldapMapper.selectAll();
     }
 
-    private Object getUsers(LdapContext ctx, String searchBase, Hashtable<String, String> env) {
+    private Object getUsers(LdapContext ctx, String searchBase, Hashtable<String, String> env, boolean debug) {
         HashMap<String, List<String>> result = new HashMap<>();
         String[] groupFilter = ldapProperties.getGroupFilter();
+        if (debug) {
+            groupFilter = new String[]{};
+        }
         String[] returningAttributes = ldapProperties.getReturningAttributes();
         try {
             ctx = new InitialLdapContext(env, null);
@@ -109,7 +114,7 @@ public class LdapService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
         //5. 关闭	上下文，释放连接
         finally {

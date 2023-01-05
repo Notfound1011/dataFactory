@@ -12,10 +12,6 @@ public class ActionEncoderTool {
     public ActionEncoderTool() {
     }
 
-    public static String getGreeting() {
-        return "Hello world.";
-    }
-
     public static void main(String[] args) {
         log.info("args {}", args);
         ClassLoader cl = ClassLoader.getSystemClassLoader();
@@ -35,6 +31,10 @@ public class ActionEncoderTool {
 
     public static String loadTestValue(String key, int ttlMinutes) {
         return ActionEncoder.getInstance().base64Encode(key, System.currentTimeMillis() + (long)('\uea60' * ttlMinutes));
+   }
+
+    public static String loadTestValue(String key) {
+        return ActionEncoder.getInstance().base64Encode(key);
     }
 
     public static String genTestValue(String key, int ttlMinutes, String token) {
