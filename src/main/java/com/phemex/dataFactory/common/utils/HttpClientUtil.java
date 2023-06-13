@@ -66,6 +66,17 @@ public class HttpClientUtil {
         return jsonPost(url, params, null);
     }
 
+
+    /**
+     * Description: post请求（用于请求json格式的参数）
+     *
+     * @param url 路径
+     * @return 响应结果
+     */
+    public static String jsonPost(String url, Map<String, String> headers) throws Exception {
+        return jsonPost(url, null, headers);
+    }
+
     /**
      * Description: get请求
      *
@@ -177,7 +188,9 @@ public class HttpClientUtil {
             //设置请求头
             setHeader(headers, httpPost);
             //设置参数
-            httpPost.setEntity(new StringEntity(params, ENCODING));
+            if(params != null){
+                httpPost.setEntity(new StringEntity(params, ENCODING));
+            }
             RequestConfig config = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
             httpPost.setConfig(config);
 
