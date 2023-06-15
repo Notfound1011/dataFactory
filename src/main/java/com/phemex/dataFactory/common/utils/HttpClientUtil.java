@@ -35,7 +35,7 @@ public class HttpClientUtil {
     private static final int SOCKET_TIMEOUT = 5000;
 
     /**
-     * Description: get请求
+     * Description: get请求（适用于无请求头）
      *
      * @param url 路径
      * @return 响应结果
@@ -45,10 +45,10 @@ public class HttpClientUtil {
     }
 
     /**
-     * Description: post请求
+     * Description: post请求（适用于无请求头）
      *
-     * @param url    路径
-     * @param params 参数
+     * @param url    请求路径
+     * @param params url后带的参数
      * @return 响应结果
      */
     public static String post(String url, Map<String, Object> params) throws Exception {
@@ -56,21 +56,22 @@ public class HttpClientUtil {
     }
 
     /**
-     * Description: post请求（用于请求json格式的参数）
+     * Description: post请求（适用于请求体为json格式，无请求头）
      *
      * @param url    路径
-     * @param params json参数
+     * @param body json参数
      * @return 响应结果
      */
-    public static String jsonPost(String url, String params) throws Exception {
-        return jsonPost(url, params, null);
+    public static String jsonPost(String url, String body) throws Exception {
+        return jsonPost(url, body, null);
     }
 
 
     /**
-     * Description: post请求（用于请求json格式的参数）
+     * Description: post请求（适用于有请求头，无请求体）
      *
      * @param url 路径
+     * @param headers 请求头信息
      * @return 响应结果
      */
     public static String jsonPost(String url, Map<String, String> headers) throws Exception {
@@ -137,8 +138,8 @@ public class HttpClientUtil {
     /**
      * Description: post请求
      *
-     * @param url     路径
-     * @param params  参数
+     * @param url     请求路径
+     * @param params  url后带的参数
      * @param headers 请求头信息
      * @return 响应结果
      */
@@ -171,11 +172,11 @@ public class HttpClientUtil {
      * Description: post请求（用于请求json格式的参数）
      *
      * @param url     路径
-     * @param params  json参数
+     * @param body  json请求参数
      * @param headers 请求头信息
      * @return 响应结果
      */
-    public static String jsonPost(String url, String params, Map<String, String> headers) throws Exception {
+    public static String jsonPost(String url, String body, Map<String, String> headers) throws Exception {
         CloseableHttpClient httpClient = null;
         HttpPost httpPost;
         CloseableHttpResponse httpResponse = null;
@@ -188,8 +189,8 @@ public class HttpClientUtil {
             //设置请求头
             setHeader(headers, httpPost);
             //设置参数
-            if(params != null){
-                httpPost.setEntity(new StringEntity(params, ENCODING));
+            if(body != null){
+                httpPost.setEntity(new StringEntity(body, ENCODING));
             }
             RequestConfig config = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
             httpPost.setConfig(config);

@@ -9,11 +9,11 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.phemex</groupId>
-    <artifactId>data-factory</artifactId>
+    <artifactId>dataFactory</artifactId>
     <version>1.0.0</version>
     <name>dataFactory</name>
     <properties>
-        <java.version>11</java.version>
+        <java.version>11.0.14</java.version>
     </properties>
     <dependencies>
         <dependency>

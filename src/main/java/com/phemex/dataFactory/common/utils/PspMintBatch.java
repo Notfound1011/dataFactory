@@ -1,15 +1,6 @@
 package com.phemex.dataFactory.common.utils;
 
-/**
- * @author: yuyu.shi
- * @Project: phemex
- * @Package: com.phemex.dataFactory.common.utils.tokenGen
- * @Date: 2022年05月09日 10:56
- * @Description:
- */
-
 import com.alibaba.fastjson.JSONObject;
-import org.apache.http.client.methods.CloseableHttpResponse;
 
 import java.io.*;
 import java.util.HashMap;
@@ -17,30 +8,40 @@ import java.util.HashMap;
 import static com.phemex.dataFactory.common.utils.LoadTestCommon.*;
 import static com.phemex.dataFactory.common.utils.RequestTask.getCurrentTime;
 
+/**
+ * @author: yuyu.shi
+ * @Project: phemex
+ * @Package: com.phemex.dataFactory.common.utils
+ * @Date: 2023年06月09日 10:56
+ * @Description:
+ */
 public class PspMintBatch {
     public static void main(String[] args) throws Exception {
 //        UserRegisterRequest urr = new UserRegisterRequest();
 //        urr.setEmailPrefix("stakeloadtest");
 //        urr.setEmailSuffix("@yopmail.com");
 //        urr.setPassword("Shiyu@123");
-//        urr.setNumStart(504);
-//        urr.setNumEnd(504);
-//        urr.setReqDelayMs(1000);
-//        List<RegistrationInfo> aa  = registerUsers(urr);  //注册账号
+//        urr.setNumStart(1816);
+//        urr.setNumEnd(5000);
+////        urr.setNumList(Arrays.asList(1067,1184));
+//        urr.setReqDelayMs(10);
+//        registerUsers(urr);  //注册账号
 //        System.out.println(aa);
 
 //        genTokenByLogin(false, true); //通过登录获取token
-        deposit(10000, "USDT");  // 充值
+//        loginAndMint(); // 串行方式，先登录再mint
+//        deposit(100000, "USDT");  // 充值
+
+        stakeMock("1848615");
     }
 
     /**
-     * @Description: csv的方式，通过登录获取token
-     * @Date: 2022/12/30
-     * @Param append: true/false 是否追加写入
+     * @Description: 串行的方式发起登录，可在登录后执行其他逻辑，效率较低
+     * @Date: 2023/06/09
      * @Param loginOnly: true/false 是否仅执行登录逻辑
      **/
-    static void genTokenByLogin(Boolean append, Boolean loginOnly) throws Exception {
-        String baseFilePath = "src/main/resources/input/user_login_info.csv";
+    static void loginAndMint() throws Exception {
+        String baseFilePath = "src/main/resources/input/emails.txt";
 //        String outputFilePath = "src/main/resources/output/user_login_result.csv";
         String outputFilePath = "src/main/resources/input/token.txt";
 
@@ -55,15 +56,14 @@ public class PspMintBatch {
                     // 设置请求头
                     HashMap<String, String> header = getHeader();
 
-                    TokenInfo token = getTokenByLogin(header, str.split(",")[1], str.split(",")[2]);
+                    TokenInfo token = getTokenByLogin(header, str.split(",")[1], "Shiyu@123");
                     System.out.println(num++ + ": " + token.getResponseHeader() + token.getBody().get("email"));
                     strBuffer.append(str).append(",").append(token.getResponseHeader());
                     strBuffer.append("\n"); // 行与行之间的分割
 
+                    // 也可以加入其他逻辑
                     // bind和mint
-                    if (!loginOnly) {
-                        mint(str, header, token.getResponseHeader());
-                    }
+                    mint(str.split(",")[0], header, token.getResponseHeader());
 
                 } catch (Exception e) {
                     System.out.println("请求接口时发生错误。");
@@ -75,67 +75,46 @@ public class PspMintBatch {
         }
 
         //写入文件
-        writeToFile(outputFilePath, strBuffer.toString(), append);
+        writeToFile(outputFilePath, strBuffer.toString(), false);
     }
 
-    /**
-     * @Description: 通过登录获取token
-     * @Date: 2022/12/30
-     * @Param null:
-     **/
-    static TokenInfo getTokenByLogin(HashMap<String, String> header, String email, String password) throws Exception {
-        // 设置请求体
-        HashMap<String, Object> body = new HashMap<>();
-        body.put("email", email);
-        body.put("password", password);
-        body.put("encryptVersion", 0);
-        JSONObject jsonObj = new JSONObject(body);
 
-        String res = HttpClientUtil.jsonPost("https://fat3.phemex.com/api/phemex-user/users/login", jsonObj.toString(), header);
-        JSONObject json_res = (JSONObject) JSONObject.parse(res);
-        System.out.println(json_res);
+    static void loginAndOthers(String param) throws Exception {
+        try {
+            // 设置请求头
+            HashMap<String, String> header = getHeader();
 
-        String code = (String) json_res.getJSONObject("data").get("code");
-        String url = "https://fat3.phemex.com/api/phemex-user/users/confirm/login" + "?code=" + code + "&mailCode=111111";
-        CloseableHttpResponse res2 = HttpClientUtil.httpGet(url, header);
-        String responseHeader = res2.getFirstHeader("phemex-auth-token").getValue();
+            TokenInfo token = getTokenByLogin(header, param.split(",")[1], "Shiyu@123");
+            System.out.println(token.getBody().get("email") + ": login success");
 
-        return new TokenInfo(body, responseHeader);
+            // bind和mint
+//            mint(param.split(",")[0], header, token.getResponseHeader());
+
+            // redeem
+            redeem(header, token.getResponseHeader());
+        } catch (Exception e) {
+            System.out.println("请求接口时发生错误。");
+            e.printStackTrace();
+        }
+
     }
 
-    static class TokenInfo {
-        private final HashMap<String, Object> body;
-        private final String responseHeader;
-
-        public TokenInfo(HashMap<String, Object> body, String responseHeader) {
-            this.body = body;
-            this.responseHeader = responseHeader;
-        }
-
-        public HashMap<String, Object> getBody() {
-            return body;
-        }
-
-        public String getResponseHeader() {
-            return responseHeader;
-        }
-    }
-
-    private static void mint(String str, HashMap<String, String> header, String responseHeader) throws Exception {
+    private static void mint(String address, HashMap<String, String> header, String responseHeader) throws Exception {
         header.put("phemex-auth-token", responseHeader);
 
 
         HashMap<String, Object> bindBody = new HashMap<>();
-        bindBody.put("address", str.split(",")[3]);
+        bindBody.put("address", address);
         bindBody.put("source", "Phemex");
 
         JSONObject jsonbindObj = new JSONObject(bindBody);
+        System.out.println(jsonbindObj);
 
-        String resBind = HttpClientUtil.jsonPost("https://api10-fat2.phemex.com/phemex-account/soul-pass/wallets/bind", jsonbindObj.toString(), header);
+        String resBind = HttpClientUtil.jsonPost("https://api10-fat.phemex.com/phemex-account/soul-pass/wallets/bind", jsonbindObj.toString(), header);
         JSONObject jsonResBind = (JSONObject) JSONObject.parse(resBind);
         System.out.println("bind结果" + jsonResBind);
 
-        String resMint = HttpClientUtil.jsonPost("https://api10-fat3.phemex.com/phemex-account/soul-pass/mint", header);
+        String resMint = HttpClientUtil.jsonPost("https://api10-fat.phemex.com/phemex-account/soul-pass/mint", header);
         JSONObject jsonResMint = (JSONObject) JSONObject.parse(resMint);
         System.out.println("mint结果" + jsonResMint);
     }
@@ -156,7 +135,7 @@ public class PspMintBatch {
         stakeBody.put("projectKey", "PT-STAKE");
         stakeBody.put("amountRq", "11");
         stakeBody.put("expiryTime", 1686700800000L);
-        stakeBody.put("gasFeeRq", 0.40650407);
+        stakeBody.put("gasFeeRq", 0.41666667);
 
         JSONObject jsonstakeObj = new JSONObject(stakeBody);
 
@@ -166,5 +145,43 @@ public class PspMintBatch {
         JSONObject jsonResStake = (JSONObject) JSONObject.parse(resStake);
         System.out.println("stake结果" + jsonResStake);
         return jsonResStake.toString();
+    }
+
+
+    public static String stakeMock(String clientId) throws Exception {
+        // 设置请求头
+        HashMap<String, String> header = getHeader();
+
+        HashMap<String, Object> stakeBody = new HashMap<>();
+        stakeBody.put("projectKey", "PT-STAKE");
+        stakeBody.put("amountRq", "100");
+        stakeBody.put("expiryTime", 1687046400000L);
+        stakeBody.put("gasFeeRq", 0.41666667);
+
+        JSONObject jsonStakeObj = new JSONObject(stakeBody);
+
+        // 打印请求开始时间
+        System.out.println("Start Time: " + getCurrentTime());
+        String url = "https://api10-fat2.phemex.com/phemex-stake/public/robot/stake?userId=" + clientId;
+        String resStake = HttpClientUtil.jsonPost(url, jsonStakeObj.toString(), header);
+        JSONObject jsonResStake = (JSONObject) JSONObject.parse(resStake);
+        System.out.println("stakeMock结果: " + jsonResStake);
+        return jsonResStake.toString();
+    }
+
+
+    private static void redeem(HashMap<String, String> header, String responseHeader) throws Exception {
+        header.put("phemex-auth-token", responseHeader);
+
+
+        HashMap<String, Object> redeemBody = new HashMap<>();
+        redeemBody.put("projectKey", "PT-STAKE");
+
+        JSONObject jsonRedeemObj = new JSONObject(redeemBody);
+        System.out.println(jsonRedeemObj);
+
+        String resRedeem = HttpClientUtil.jsonPost("https://api10-fat2.phemex.com/phemex-stake/redeem", jsonRedeemObj.toString(), header);
+        JSONObject jsonResRedeem = (JSONObject) JSONObject.parse(resRedeem);
+        System.out.println("redeem结果" + jsonResRedeem);
     }
 }

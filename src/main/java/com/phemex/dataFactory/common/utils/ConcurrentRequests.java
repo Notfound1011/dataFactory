@@ -25,13 +25,14 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import static com.phemex.dataFactory.common.utils.LoadTestCommon.getHeader;
+import static com.phemex.dataFactory.common.utils.LoadTestCommon.*;
+import static com.phemex.dataFactory.common.utils.LoadTestCommon.getTokenByLogin;
 import static com.phemex.dataFactory.common.utils.PspMintBatch.*;
 
 
 public class ConcurrentRequests {
-    private static final int NUM_USERS = 500;
-    private static final int REQUESTS_PER_SECOND = 50;
+    private static final int NUM_USERS = 50;
+    private static final int CONCURRENT_ACCESS = 50;
 
 
     public static void main(String[] args) throws IOException {
@@ -43,9 +44,23 @@ public class ConcurrentRequests {
 
 
         // stake: 读取tokens,执行并发stake请求
-        String inputFilePath = "src/main/resources/output/tokens.txt";
-        String methodName = "stake";
-        String outputFilePath = "src/main/resources/output/stakeResults.txt";
+//        String inputFilePath = "src/main/resources/output/tokens.txt";
+//        String methodName = "stake";
+//        String outputFilePath = "src/main/resources/output/stakeResults.txt";
+//        executeConcurrentRequests(inputFilePath, methodName, outputFilePath);
+
+
+        // 登录并执行其他请求: 执行并发loginAndOthers请求
+//        String inputFilePath = "src/main/resources/input/emails.txt";
+//        String methodName = "loginAndOthers";
+//        String outputFilePath = "src/main/resources/output/mintResults.txt";
+//        executeConcurrentRequests(inputFilePath, methodName, outputFilePath);
+
+
+        // stakeMock: 读取clientId,执行并发stakeMock请求
+        String inputFilePath = "src/main/resources/input/clientId.txt";
+        String methodName = "stakeMock";
+        String outputFilePath = "src/main/resources/output/stakeMockResults.txt";
         executeConcurrentRequests(inputFilePath, methodName, outputFilePath);
 
     }
@@ -56,13 +71,16 @@ public class ConcurrentRequests {
         // 创建线程池
         ExecutorService executor = Executors.newFixedThreadPool(NUM_USERS);
 
-        // 创建Semaphore对象，设置初始许可数为10
-        Semaphore semaphore = new Semaphore(REQUESTS_PER_SECOND);
+        // 创建Semaphore对象，设置初始许可数为10，许可证数量表示同时允许访问共享资源的线程数。
+        Semaphore semaphore = new Semaphore(CONCURRENT_ACCESS);
 
         // 创建文件写入器
         BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilePath));
         List<String> paramList = new ArrayList<>(params);
-        for (int i = 0; i < NUM_USERS; i++) {
+
+        // 根据文件的行数进行循环
+        int totalLines = paramList.size();
+        for (int i = 0; i < totalLines; i++) {
             // 获取一个不重复的param
             String param = getRandomParam(paramList);
             // 提交并发请求任务给线程池
@@ -127,10 +145,17 @@ class RequestTask implements Runnable {
                 String result = stake(param);
                 writer.write(result + "\n");
                 writer.flush();
+            } else if (methodName.equals("stakeMock")) {
+                String result = stakeMock(param);
+                writer.write(result + "\n");
+                writer.flush();
+            } else if (methodName.equals("loginAndOthers")) {
+                loginAndOthers(param);
             }
 
+
             // 模拟请求的耗时
-            Thread.sleep(500);
+            Thread.sleep(100);
 
             // 打印请求结束时间
             System.out.println("End Time: " + getCurrentTime());

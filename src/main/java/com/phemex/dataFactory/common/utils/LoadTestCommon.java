@@ -1,6 +1,7 @@
 package com.phemex.dataFactory.common.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.http.client.methods.CloseableHttpResponse;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -47,17 +48,7 @@ public class LoadTestCommon {
     }
 
     private static final String[] US_IP_RANGES = {
-            "3.0.0.0", "3.255.255.255", "8.0.0.0", "8.255.255.255", "13.0.0.0", "13.255.255.255", "17.0.0.0", "17.255.255.255",
-            "18.0.0.0", "18.255.255.255", "19.0.0.0", "19.255.255.255", "20.0.0.0", "20.255.255.255", "23.0.0.0", "23.255.255.255",
-            "24.0.0.0", "24.255.255.255", "27.0.0.0", "27.255.255.255", "32.0.0.0", "32.255.255.255", "50.0.0.0", "50.255.255.255",
-            "64.0.0.0", "64.255.255.255", "65.0.0.0", "65.255.255.255", "66.0.0.0", "66.255.255.255",
-            "67.0.0.0", "67.255.255.255", "68.0.0.0", "68.255.255.255", "69.0.0.0", "69.255.255.255", "70.0.0.0", "70.255.255.255", "71.0.0.0", "71.255.255.255",
-            "72.0.0.0", "72.255.255.255", "73.0.0.0", "73.255.255.255", "74.0.0.0", "74.255.255.255", "96.0.0.0", "96.255.255.255",
-            "97.0.0.0", "97.255.255.255", "98.0.0.0", "98.255.255.255", "99.0.0.0", "99.255.255.255", "100.0.0.0", "100.255.255.255",
-            "104.0.0.0", "104.255.255.255", "107.0.0.0", "107.255.255.255", "108.0.0.0", "108.255.255.255", "162.0.0.0", "162.255.255.255",
-            "173.0.0.0", "173.255.255.255", "184.0.0.0", "184.255.255.255", "199.0.0.0", "199.255.255.255", "204.0.0.0", "204.255.255.255",
-            "205.0.0.0", "205.255.255.255", "206.0.0.0", "206.255.255.255", "207.0.0.0", "207.255.255.255", "208.0.0.0", "208.255.255.255",
-            "209.0.0.0", "209.255.255.255", "216.0.0.0", "216.255.255.255", "198.0.0.0", "198.255.255.255"
+            "23.95.40.0","23.95.43.255"
     };
 
     public static String getRandomIp() {
@@ -149,6 +140,51 @@ public class LoadTestCommon {
         } catch (IOException e) {
             System.out.println("写入文件时发生错误。");
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * @Description: 通过登录获取token
+     * @Date: 2022/12/30
+     * @Param header: 请求头
+     * @Param email: 登录用户名/邮箱
+     * @Param password: 密码
+     **/
+    static TokenInfo getTokenByLogin(HashMap<String, String> header, String email, String password) throws Exception {
+        // 设置请求体
+        HashMap<String, Object> body = new HashMap<>();
+        body.put("email", email);
+        body.put("password", password);
+        body.put("encryptVersion", 0);
+        JSONObject jsonObj = new JSONObject(body);
+
+        String res = HttpClientUtil.jsonPost("https://fat3.phemex.com/api/phemex-user/users/login", jsonObj.toString(), header);
+        JSONObject json_res = (JSONObject) JSONObject.parse(res);
+        System.out.println(json_res);
+
+        String code = (String) json_res.getJSONObject("data").get("code");
+        String url = "https://fat3.phemex.com/api/phemex-user/users/confirm/login" + "?code=" + code + "&mailCode=111111";
+        CloseableHttpResponse res2 = HttpClientUtil.httpGet(url, header);
+        String responseHeader = res2.getFirstHeader("phemex-auth-token").getValue();
+
+        return new TokenInfo(body, responseHeader);
+    }
+
+    static class TokenInfo {
+        private final HashMap<String, Object> body;
+        private final String responseHeader;
+
+        public TokenInfo(HashMap<String, Object> body, String responseHeader) {
+            this.body = body;
+            this.responseHeader = responseHeader;
+        }
+
+        public HashMap<String, Object> getBody() {
+            return body;
+        }
+
+        public String getResponseHeader() {
+            return responseHeader;
         }
     }
 

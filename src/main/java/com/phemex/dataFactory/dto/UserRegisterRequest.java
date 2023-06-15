@@ -3,6 +3,7 @@ package com.phemex.dataFactory.dto;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author: yuyu.shi
@@ -19,5 +20,6 @@ public class UserRegisterRequest implements Serializable {
     private String password;
     private int numStart;
     private int numEnd;
+    private List<Integer> numList;
     private int reqDelayMs;
 }
