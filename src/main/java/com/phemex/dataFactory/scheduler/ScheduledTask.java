@@ -17,7 +17,7 @@ import java.util.Date;
  */
 @Component
 public class ScheduledTask {
-    private static Logger logger = LoggerFactory.getLogger(ScheduledTask.class);
+    private final static Logger logger = LoggerFactory.getLogger(ScheduledTask.class);
 
     //  fixedRate 是 long 类型，表示任务执行的间隔毫秒数，以上代码中的定时任务每 5 秒执行一次。
     @Scheduled(cron="0 0 12 * * ?")

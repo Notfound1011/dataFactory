@@ -20,7 +20,7 @@ public class BytesUtils {
 
         for(int i = 7; i >= 0; --i) {
             res <<= 8;
-            res |= (long)(b[i] & 255);
+            res |= b[i] & 255;
         }
 
         return res;

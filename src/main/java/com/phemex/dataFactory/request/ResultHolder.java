@@ -1,4 +1,4 @@
-package com.phemex.dataFactory.controller.request;
+package com.phemex.dataFactory.request;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;

@@ -1,9 +1,9 @@
-package com.phemex.dataFactory.common.utils;
+package com.phemex.dataFactory.tools;
 
 /**
  * @author: yuyu.shi
  * @Project: phemex
- * @Package: com.phemex.dataFactory.common.utils.GenUserSqlGen
+ * @Package: com.phemex.dataFactory.tools.GenUserSqlGen
  * @Date: 2022年06月08日 10:56
  * @Description:
  */

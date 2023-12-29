@@ -1,24 +1,29 @@
-package com.phemex.dataFactory.dto;
+package com.phemex.dataFactory.request.base;
 
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author: yuyu.shi
  * @Project: phemex
- * @Package: com.phemex.dataFactory.dto.LdapUserDTO
- * @Date: 2022年05月12日 18:59
+ * @Package: com.phemex.dataFactory.request.base.User
+ * @Date: 2022年09月01日 11:58
  * @Description:
  */
 @Data
-public class LdapUserDTO implements Serializable {
+public class User implements Serializable {
     private String id;
 
-    private String user;
+    private String name;
+
+    private String email;
+
+    private String role;
 
     private String group;
+
+    private String status;
 
     private Long createTime;
 

@@ -16,11 +16,20 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.util.Properties;
 
+/**
+ * @Description: 数据库配置
+ * @Date: 2023/6/21
+ * @Param null:
+ **/
 @Configuration
 @MapperScan(basePackages = {"com.phemex.dataFactory.mapper"}, sqlSessionFactoryRef = "sqlSessionFactory")
 @EnableTransactionManagement
 public class DatabaseConfig {
-
+    /**
+     * 配置分页拦截器
+     *
+     * @return 分页拦截器实例
+     */
     @Bean
     @ConditionalOnMissingBean
     public PageInterceptor pageInterceptor() {
@@ -35,6 +44,12 @@ public class DatabaseConfig {
         return pageInterceptor;
     }
 
+    /**
+     * 配置主数据源
+     *
+     * @param properties 数据源配置属性
+     * @return DataSource 主数据源实例
+     */
     @Bean
     @Primary
     @ConfigurationProperties(prefix = "spring.datasource.hikari")
@@ -47,6 +62,12 @@ public class DatabaseConfig {
                 .build();
     }
 
+    /**
+     * 配置 Quartz 数据源
+     *
+     * @param properties 数据源配置属性
+     * @return DataSource Quartz 数据源实例
+     */
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource.quartz.hikari")
     @QuartzDataSource
@@ -58,5 +79,4 @@ public class DatabaseConfig {
                 .password(properties.determinePassword())
                 .build();
     }
-
 }

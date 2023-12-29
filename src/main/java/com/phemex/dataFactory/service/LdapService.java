@@ -2,9 +2,8 @@ package com.phemex.dataFactory.service;
 
 import com.phemex.dataFactory.common.utils.LogUtil;
 import com.phemex.dataFactory.config.LdapProperties;
-import com.phemex.dataFactory.dto.LdapUserDTO;
+import com.phemex.dataFactory.response.LdapUserResp;
 import com.phemex.dataFactory.mapper.LdapMapper;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -57,7 +56,7 @@ public class LdapService {
 //        ldapMapper.insert(ldapUserDTO);
 //    }
 
-    public List<LdapUserDTO> selectAll() {
+    public List<LdapUserResp> selectAll() {
         return ldapMapper.selectAll();
     }
 
@@ -97,16 +96,16 @@ public class LdapService {
                         newGroupList.remove(s);
                     }
 
-                    LdapUserDTO ldapUserDTO = new LdapUserDTO();
-                    ldapUserDTO.setUser(user);
-                    ldapUserDTO.setGroup(newGroupList.toString());
-                    ldapUserDTO.setId(UUID.randomUUID().toString());
-                    ldapUserDTO.setCreateTime(System.currentTimeMillis());
-                    ldapUserDTO.setUpdateTime(System.currentTimeMillis());
-                    if (ldapMapper.countByUser(ldapUserDTO.getUser()) > 0) {
-                        ldapMapper.updateByUser(ldapUserDTO);
+                    LdapUserResp ldapUserResp = new LdapUserResp();
+                    ldapUserResp.setUser(user);
+                    ldapUserResp.setGroup(newGroupList.toString());
+                    ldapUserResp.setId(UUID.randomUUID().toString());
+                    ldapUserResp.setCreateTime(System.currentTimeMillis());
+                    ldapUserResp.setUpdateTime(System.currentTimeMillis());
+                    if (ldapMapper.countByUser(ldapUserResp.getUser()) > 0) {
+                        ldapMapper.updateByUser(ldapUserResp);
                     } else {
-                        ldapMapper.insert(ldapUserDTO);
+                        ldapMapper.insert(ldapUserResp);
                     }
                     result.put(user, newGroupList);
                 } catch (Exception e) {

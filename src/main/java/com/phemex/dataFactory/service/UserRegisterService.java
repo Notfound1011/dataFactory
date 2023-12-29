@@ -3,8 +3,8 @@ package com.phemex.dataFactory.service;
 import com.alibaba.fastjson.JSONObject;
 import com.phemex.dataFactory.common.utils.HttpClientUtil;
 import com.phemex.dataFactory.common.utils.PspMintBatch;
-import com.phemex.dataFactory.dto.RegistrationInfo;
-import com.phemex.dataFactory.dto.UserRegisterRequest;
+import com.phemex.dataFactory.response.RegistrationResp;
+import com.phemex.dataFactory.request.UserRegisterRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,40 +34,40 @@ public class UserRegisterService {
     private static final String API_CONFIRM_REGISTER = "https://api10-fat3.phemex.com/phemex-user/users/confirm/register";
     private static final String OUTPUT_FILE_PATH = "src/main/resources/output/user_register_result.csv";
 
-    public static List<RegistrationInfo> registerUsers(UserRegisterRequest userRegisterRequest) throws Exception {
-        List<RegistrationInfo> registrationInfo = new ArrayList<>();
+    public static List<RegistrationResp> registerUsers(UserRegisterRequest userRegisterRequest) throws Exception {
+        List<RegistrationResp> registrationResp = new ArrayList<>();
         StringBuffer strBuffer = new StringBuffer();
         strBuffer.append("id,email,result\n");
         List<Integer> numList = userRegisterRequest.getNumList();
         if (null == numList || numList.isEmpty()) {
             for (int i = userRegisterRequest.getNumStart(); i <= userRegisterRequest.getNumEnd(); i++) {
-                register(userRegisterRequest, registrationInfo, strBuffer, i);
+                register(userRegisterRequest, registrationResp, strBuffer, i);
             }
         } else {
             for (int i : numList) {
-                register(userRegisterRequest, registrationInfo, strBuffer, i);
+                register(userRegisterRequest, registrationResp, strBuffer, i);
             }
         }
 
         writeToFile(OUTPUT_FILE_PATH, strBuffer.toString(), false);
-        return registrationInfo;
+        return registrationResp;
     }
 
-    private static void register(UserRegisterRequest userRegisterRequest, List<RegistrationInfo> registrationInfo, StringBuffer strBuffer, int i) throws InterruptedException {
+    private static void register(UserRegisterRequest userRegisterRequest, List<RegistrationResp> registrationResp, StringBuffer strBuffer, int i) throws InterruptedException {
         String email = generateEmail(userRegisterRequest.getEmailPrefix(), i, userRegisterRequest.getEmailSuffix());
         try {
-            JSONObject res = registerUser(email, userRegisterRequest.getPassword());
+            JSONObject res = registerUser(email, userRegisterRequest.getPassword(), userRegisterRequest.getReferralCode());
             int code = (int) res.get("code");
             if (code == 0) {
-                registrationInfo.add(new RegistrationInfo(i, email, "success", (String) res.get("msg")));
+                registrationResp.add(new RegistrationResp(i, email, "success", (String) res.get("msg")));
                 logger.info("Registered user: {}", email);
             } else {
-                registrationInfo.add(new RegistrationInfo(i, email, "failed", (String) res.get("msg")));
+                registrationResp.add(new RegistrationResp(i, email, "failed", (String) res.get("msg")));
             }
             strBuffer.append(i + "," + email + ",").append(code == 0 ? "success" : "failed").append("\n");
         } catch (Exception e) {
             logger.error("Failed to register user: {}", email, e);
-            registrationInfo.add(new RegistrationInfo(i, email, "failed", e.toString()));
+            registrationResp.add(new RegistrationResp(i, email, "failed", e.toString()));
             return;
         }
         Thread.sleep(userRegisterRequest.getReqDelayMs());
@@ -77,14 +77,14 @@ public class UserRegisterService {
         return emailPrefix + index + emailSuffix;
     }
 
-    private static JSONObject registerUser(String email, String password) throws Exception {
+    private static JSONObject registerUser(String email, String password, String referralCode) throws Exception {
         HashMap<String, String> header = getHeader();
 
         HashMap<String, Object> body = new HashMap<>();
         body.put("email", email);
         body.put("password", password);
         body.put("encryptVersion", 0);
-        body.put("referralCode", "");
+        body.put("referralCode", referralCode);
         body.put("nickName", "");
         body.put("lang", "en");
         body.put("group", 0);

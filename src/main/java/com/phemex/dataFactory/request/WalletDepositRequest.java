@@ -1,4 +1,4 @@
-package com.phemex.dataFactory.dto;
+package com.phemex.dataFactory.request;
 
 import lombok.Getter;
 import lombok.Setter;

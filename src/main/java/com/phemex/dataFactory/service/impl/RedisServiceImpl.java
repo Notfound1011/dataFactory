@@ -16,8 +16,13 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 public class RedisServiceImpl implements RedisService {
+    private final StringRedisTemplate stringRedisTemplate;
+
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    public RedisServiceImpl(StringRedisTemplate stringRedisTemplate) {
+        this.stringRedisTemplate = stringRedisTemplate;
+    }
+
 
     @Override
     public void set(String key, String value) {
@@ -41,6 +46,6 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Long increment(String key, long delta) {
-        return stringRedisTemplate.opsForValue().increment(key,delta);
+        return stringRedisTemplate.opsForValue().increment(key, delta);
     }
 }

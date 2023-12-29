@@ -44,7 +44,7 @@ public class RawAesMessageEncryptor {
         this.init(input);
     }
 
-    public RawAesMessageEncryptor() throws Exception {
+    public RawAesMessageEncryptor() {
         this("9Aq@0#cdd#{}!@Y5260&43");
     }
 

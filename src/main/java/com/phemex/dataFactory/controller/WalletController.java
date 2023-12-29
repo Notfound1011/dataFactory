@@ -1,10 +1,10 @@
 package com.phemex.dataFactory.controller;
 
 import com.phemex.dataFactory.common.utils.*;
+import com.phemex.dataFactory.request.WalletDepositRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
-import com.phemex.dataFactory.dto.*;
 
 /**
  * @author: yuyu.shi

@@ -1,6 +1,6 @@
-package com.phemex.dataFactory.controller.request;
+package com.phemex.dataFactory.request;
 
-import com.phemex.dataFactory.base.domain.User;
+import com.phemex.dataFactory.request.base.User;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,4 +1,4 @@
-package com.phemex.dataFactory.dto;
+package com.phemex.dataFactory.response;
 
 import lombok.Data;
 
@@ -7,18 +7,18 @@ import java.io.Serializable;
 /**
  * @author: yuyu.shi
  * @Project: phemex
- * @Package: com.phemex.dataFactory.dto.RegistrationInfo
+ * @Package: com.phemex.dataFactory.response.RegistrationInfo
  * @Date: 2023年06月12日 10:36
  * @Description:
  */
 @Data
-public class RegistrationInfo implements Serializable {
+public class RegistrationResp implements Serializable {
     private int id;
     private String email;
     private String result;
     private String msg;
 
-    public RegistrationInfo(int id, String email, String result, String msg) {
+    public RegistrationResp(int id, String email, String result, String msg) {
         this.id = id;
         this.email = email;
         this.result = result;

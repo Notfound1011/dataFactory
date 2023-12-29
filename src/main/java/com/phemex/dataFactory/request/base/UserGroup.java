@@ -1,4 +1,4 @@
-package com.phemex.dataFactory.base.domain;
+package com.phemex.dataFactory.request.base;
 
 import lombok.Data;
 
@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * @author: yuyu.shi
  * @Project: phemex
- * @Package: com.phemex.dataFactory.base.domain.User
+ * @Package: com.phemex.dataFactory.request.base.User
  * @Date: 2022年09月01日 11:58
  * @Description:
  */

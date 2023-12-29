@@ -98,7 +98,7 @@ public class HttpClientUtil {
             setHeader(headers, httpGet);
             RequestConfig config = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
             httpGet.setConfig(config);
-            result = getHttpClientResult(httpResponse, httpClient, httpGet);
+            result = getHttpClientResult(httpClient, httpGet);
         } finally {
             release(httpResponse, httpClient);
         }
@@ -117,7 +117,6 @@ public class HttpClientUtil {
         CloseableHttpClient httpClient = null;
         HttpGet httpGet;
         CloseableHttpResponse httpResponse = null;
-        String result;
         try {
             httpClient = HttpClientBuilder.create().build();
 
@@ -159,7 +158,7 @@ public class HttpClientUtil {
             RequestConfig config = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
             httpPost.setConfig(config);
 
-            result = getHttpClientResult(httpResponse, httpClient, httpPost);
+            result = getHttpClientResult(httpClient, httpPost);
 //            httpResponse = httpClient.execute(httpPost);
         } finally {
             release(httpResponse, httpClient);
@@ -195,7 +194,7 @@ public class HttpClientUtil {
             RequestConfig config = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
             httpPost.setConfig(config);
 
-            result = getHttpClientResult(httpResponse, httpClient, httpPost);
+            result = getHttpClientResult(httpClient, httpPost);
         } finally {
             release(httpResponse, httpClient);
         }
@@ -229,7 +228,7 @@ public class HttpClientUtil {
 
             RequestConfig config = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
             httpPut.setConfig(config);
-            result = getHttpClientResult(httpResponse, httpClient, httpPut);
+            result = getHttpClientResult(httpClient, httpPut);
         } finally {
             release(httpResponse, httpClient);
         }
@@ -302,16 +301,15 @@ public class HttpClientUtil {
     /**
      * Description: 获取响应结果
      *
-     * @param httpResponse httpResponse
-     * @param httpClient   httpClient
-     * @param httpMethod   httpMethod
+     * @param httpClient httpClient
+     * @param httpMethod httpMethod
      * @return 响应结果
      * @throws Exception Exception
      */
-    public static String getHttpClientResult(CloseableHttpResponse httpResponse, CloseableHttpClient httpClient, HttpRequestBase httpMethod) throws Exception {
+    public static String getHttpClientResult(CloseableHttpClient httpClient, HttpRequestBase httpMethod) throws Exception {
         String result = null;
         // 执行请求
-        httpResponse = httpClient.execute(httpMethod);
+        CloseableHttpResponse httpResponse = httpClient.execute(httpMethod);
         // 获取返回结果
         if (httpResponse != null) {
             HttpEntity resEntity = httpResponse.getEntity();

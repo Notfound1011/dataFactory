@@ -1,10 +1,9 @@
 package com.phemex.dataFactory.service;
 
-import com.phemex.dataFactory.base.domain.User;
-import com.phemex.dataFactory.base.domain.UserExample;
+import com.phemex.dataFactory.request.base.User;
+import com.phemex.dataFactory.request.base.UserExample;
 import com.phemex.dataFactory.common.constants.UserStatus;
 import com.phemex.dataFactory.common.exception.DFException;
-import com.phemex.dataFactory.common.utils.ActionEncoder;
 import com.phemex.dataFactory.mapper.UserMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;

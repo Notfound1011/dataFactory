@@ -2,7 +2,7 @@ package com.phemex.dataFactory.controller.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.phemex.dataFactory.controller.handler.annotation.NoResultHolder;
-import com.phemex.dataFactory.controller.request.ResultHolder;
+import com.phemex.dataFactory.request.ResultHolder;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;

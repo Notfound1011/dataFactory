@@ -1,5 +1,13 @@
 package com.phemex.dataFactory.common.utils;
 
+import com.phemex.dataFactory.common.exception.CommonMessageCode;
+import com.phemex.dataFactory.common.exception.PhemexException;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+
 /**
  * @author: yuyu.shi
  * @Project: phemex
@@ -7,18 +15,6 @@ package com.phemex.dataFactory.common.utils;
  * @Date: 2022年10月28日 11:55
  * @Description:
  */
-import com.phemex.dataFactory.common.exception.CommonMessageCode;
-import com.phemex.dataFactory.common.exception.PhemexException;
-import com.phemex.dataFactory.common.utils.RawAesMessageEncryptor;
-import com.phemex.dataFactory.common.utils.ActionEncoder;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
 @Slf4j
 @ConditionalOnProperty(value = "phemex.features.api.verifycode", matchIfMissing = true)
 public class LoadTestHelper {
@@ -72,7 +68,7 @@ public class LoadTestHelper {
         if (StringUtils.isEmpty(loadTestStrV2)) {
             return false;
         }
-        String v = null;
+        String v;
         try {
             v = this.rawAesMessageEncryptor.decode(encodedLoadTestStr);
         } catch (Exception ex) {

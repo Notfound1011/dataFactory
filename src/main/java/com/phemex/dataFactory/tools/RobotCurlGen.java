@@ -1,9 +1,9 @@
-package com.phemex.dataFactory.common.utils;
+package com.phemex.dataFactory.tools;
 
 /**
  * @author: yuyu.shi
  * @Project: phemex
- * @Package: com.phemex.dataFactory.common.utils.SqlGen
+ * @Package: com.phemex.dataFactory.tools.SqlGen
  * @Date: 2022年05月09日 10:56
  * @Description: Robot Faker Deposit and Transfer curl命令生成
  */

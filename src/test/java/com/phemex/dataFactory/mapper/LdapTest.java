@@ -2,21 +2,17 @@ package com.phemex.dataFactory.mapper;
 
 import com.phemex.dataFactory.Application;
 import com.phemex.dataFactory.common.utils.LogUtil;
-import com.phemex.dataFactory.dto.LdapUserDTO;
-import com.phemex.dataFactory.mapper.LdapMapper;
+import com.phemex.dataFactory.response.LdapUserResp;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,39 +41,39 @@ public class LdapTest {
     @Test
     public void testInsert() {
         //4、创建类
-        LdapUserDTO ldapUserDTO = new LdapUserDTO();
+        LdapUserResp ldapUserResp = new LdapUserResp();
         List<String> newGroupList = new ArrayList();
         newGroupList.add("aaa");
         newGroupList.add("bbb");
-        ldapUserDTO.setId("1");
-        ldapUserDTO.setUser("yuyu");
-        ldapUserDTO.setGroup(newGroupList.toString());
-        ldapUserDTO.setCreateTime(System.currentTimeMillis());
-        ldapUserDTO.setUpdateTime(System.currentTimeMillis());
+        ldapUserResp.setId("1");
+        ldapUserResp.setUser("yuyu");
+        ldapUserResp.setGroup(newGroupList.toString());
+        ldapUserResp.setCreateTime(System.currentTimeMillis());
+        ldapUserResp.setUpdateTime(System.currentTimeMillis());
         //5、调用方法
-        ldapMapper.insert(ldapUserDTO);
+        ldapMapper.insert(ldapUserResp);
     }
 
     @Test
     public void testUpdate() {
         //4、创建类
-        LdapUserDTO ldapUserDTO = new LdapUserDTO();
+        LdapUserResp ldapUserResp = new LdapUserResp();
         List<String> newGroupList = new ArrayList();
         newGroupList.add("aaa");
         newGroupList.add("bbb");
 //        ldapUserDTO.setId("1");
-        ldapUserDTO.setUser("yuyu.shi");
-        ldapUserDTO.setGroup(newGroupList.toString());
-        ldapUserDTO.setCreateTime(System.currentTimeMillis());
-        ldapUserDTO.setUpdateTime(System.currentTimeMillis());
+        ldapUserResp.setUser("yuyu.shi");
+        ldapUserResp.setGroup(newGroupList.toString());
+        ldapUserResp.setCreateTime(System.currentTimeMillis());
+        ldapUserResp.setUpdateTime(System.currentTimeMillis());
         //5、调用方法
-        ldapMapper.updateByUser(ldapUserDTO);
+        ldapMapper.updateByUser(ldapUserResp);
     }
 
     @Test
     public void testGet() {
         //5、调用方法
-        List<LdapUserDTO> aa = ldapMapper.selectAll();
+        List<LdapUserResp> aa = ldapMapper.selectAll();
         System.out.println(aa);
         LogUtil.info(aa);
     }

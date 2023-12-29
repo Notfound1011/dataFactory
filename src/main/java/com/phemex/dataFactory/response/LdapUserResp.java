@@ -1,4 +1,4 @@
-package com.phemex.dataFactory.base.domain;
+package com.phemex.dataFactory.response;
 
 import lombok.Data;
 
@@ -7,23 +7,17 @@ import java.io.Serializable;
 /**
  * @author: yuyu.shi
  * @Project: phemex
- * @Package: com.phemex.dataFactory.base.domain.User
- * @Date: 2022年09月01日 11:58
+ * @Package: com.phemex.dataFactory.response.LdapUserDTO
+ * @Date: 2022年05月12日 18:59
  * @Description:
  */
 @Data
-public class User implements Serializable {
+public class LdapUserResp implements Serializable {
     private String id;
 
-    private String name;
-
-    private String email;
-
-    private String role;
+    private String user;
 
     private String group;
-
-    private String status;
 
     private Long createTime;
 

@@ -1,10 +1,11 @@
 package com.phemex.dataFactory.controller;
 
-import com.phemex.dataFactory.controller.request.ResultHolder;
+import com.phemex.dataFactory.request.ResultHolder;
 import com.phemex.dataFactory.service.UmsMemberService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,11 +20,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @Description:
  */
 @Controller
-@Api(tags = "UmsMemberController", description = "会员登录注册管理")
+@Api(tags = "UmsMemberController")
 @RequestMapping("/sso")
 public class UmsMemberController {
+    private final UmsMemberService memberService;
+
     @Autowired
-    private UmsMemberService memberService;
+    public UmsMemberController(UmsMemberService memberService) {
+        this.memberService = memberService;
+    }
 
     @ApiOperation("获取验证码")
     @RequestMapping(value = "/getAuthCode", method = RequestMethod.GET)
@@ -37,6 +42,6 @@ public class UmsMemberController {
     @ResponseBody
     public ResultHolder updatePassword(@RequestParam String telephone,
                                        @RequestParam String authCode) {
-        return memberService.verifyAuthCode(telephone,authCode);
+        return memberService.verifyAuthCode(telephone, authCode);
     }
 }

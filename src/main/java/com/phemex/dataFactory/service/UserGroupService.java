@@ -1,15 +1,7 @@
 package com.phemex.dataFactory.service;
 
-import com.phemex.dataFactory.base.domain.User;
-import com.phemex.dataFactory.base.domain.UserExample;
-import com.phemex.dataFactory.base.domain.UserGroup;
-import com.phemex.dataFactory.common.constants.UserStatus;
-import com.phemex.dataFactory.common.exception.DFException;
+import com.phemex.dataFactory.request.base.UserGroup;
 import com.phemex.dataFactory.mapper.UserGroupMapper;
-import com.phemex.dataFactory.mapper.UserMapper;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

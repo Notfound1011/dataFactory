@@ -1,4 +1,4 @@
-package com.phemex.dataFactory.base.domain;
+package com.phemex.dataFactory.request.base;
 
 import java.util.ArrayList;
 import java.util.List;

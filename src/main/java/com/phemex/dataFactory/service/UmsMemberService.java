@@ -1,6 +1,6 @@
 package com.phemex.dataFactory.service;
 
-import com.phemex.dataFactory.controller.request.ResultHolder;
+import com.phemex.dataFactory.request.ResultHolder;
 
 /**
  * @author: yuyu.shi

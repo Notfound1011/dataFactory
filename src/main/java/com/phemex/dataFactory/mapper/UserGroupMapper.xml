@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.phemex.dataFactory.mapper.UserGroupMapper">
-    <resultMap id="BaseResultMap" type="com.phemex.dataFactory.base.domain.UserGroup">
+    <resultMap id="BaseResultMap" type="com.phemex.dataFactory.request.base.UserGroup">
         <id column="id" jdbcType="VARCHAR" property="id"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
         <result column="content" jdbcType="VARCHAR" property="content"/>

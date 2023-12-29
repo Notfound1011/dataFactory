@@ -1,17 +1,15 @@
-package com.phemex.dataFactory.common.utils;
+package com.phemex.dataFactory.tools;
+
+import java.io.*;
+import java.security.SecureRandom;
 
 /**
  * @author: yuyu.shi
  * @Project: phemex
- * @Package: com.phemex.dataFactory.common.utils.GenUserSqlGen
+ * @Package: com.phemex.dataFactory.tools.GenUserSqlGen
  * @Date: 2022年06月08日 10:56
  * @Description:
  */
-
-import java.io.*;
-import java.security.SecureRandom;
-import java.text.SimpleDateFormat;
-
 public class GenMintSqlGen {
 
     public static void main(String[] args) throws Exception {
@@ -30,7 +28,7 @@ public class GenMintSqlGen {
      **/
     private static void generateSql(String inputFilePath, String baseSql, String outputFilePath) throws IOException {
         BufferedReader bufReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFilePath)));//数据流读取文件
-        StringBuffer strBuffer = new StringBuffer();
+        StringBuilder strBuffer = new StringBuilder();
         int lineNumber = 1368;
 
         for (String str; (str = bufReader.readLine()) != null; ) {
@@ -56,7 +54,7 @@ public class GenMintSqlGen {
             System.out.println(randomHex);
 
 
-            strBuffer.append(String.format(baseSql, clientId, address, lineNumber, randomHex) + "\n");
+            strBuffer.append(String.format(baseSql, clientId, address, lineNumber, randomHex)).append("\n");
         }
 
         bufReader.close();

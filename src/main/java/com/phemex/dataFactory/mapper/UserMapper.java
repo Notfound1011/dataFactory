@@ -1,7 +1,7 @@
 package com.phemex.dataFactory.mapper;
 
-import com.phemex.dataFactory.base.domain.User;
-import com.phemex.dataFactory.base.domain.UserExample;
+import com.phemex.dataFactory.request.base.User;
+import com.phemex.dataFactory.request.base.UserExample;
 
 import java.util.List;
 

@@ -3,6 +3,8 @@ package com.phemex.dataFactory.config;
 
 import io.undertow.Undertow;
 import io.undertow.UndertowOptions;
+import io.undertow.server.handlers.DisallowedMethodsHandler;
+import io.undertow.util.HttpString;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
@@ -14,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
  * @author: yuyu.shi
  * @Project: phemex
  * @Date: 2022年04月17日 19:30
- * @Description:
+ * @Description: 基于 Undertow 的 Spring Boot 应用程序支持 HTTPS 的配置类
  */
 @Configuration
 @ConditionalOnProperty(name = "server.ssl.enabled", havingValue = "true")
@@ -23,7 +25,7 @@ public class HTTPSConfig {
     /**
      * http服务端口
      */
-    @Value("${server.port}")
+    @Value("${server.http.port}")
     private Integer httpPort;
 
     /**
@@ -32,7 +34,11 @@ public class HTTPSConfig {
     @Value("${server.port}")
     private Integer httpsPort;
 
-
+    /**
+     * 配置 Undertow ServletWebServerFactory
+     *
+     * @return ServletWebServerFactory 实例
+     */
     @Bean
     public ServletWebServerFactory undertowFactory() {
         UndertowServletWebServerFactory undertowFactory = new UndertowServletWebServerFactory();
@@ -50,6 +56,11 @@ public class HTTPSConfig {
 //                            .setEmptyRoleSemantic(SecurityInfo.EmptyRoleSemantic.PERMIT))
 //                    .setConfidentialPortManager(exchange -> httpsPort);
 //        });
+        // 禁用 TRACE 和 TRACK
+        undertowFactory.addDeploymentInfoCustomizers(deploymentInfo -> deploymentInfo.addInitialHandlerChainWrapper(handler -> {
+            HttpString[] disallowedHttpMethods = {HttpString.tryFromString("TRACE"), HttpString.tryFromString("TRACK")};
+            return new DisallowedMethodsHandler(handler, disallowedHttpMethods);
+        }));
         return undertowFactory;
     }
 

@@ -5,7 +5,7 @@ package com.phemex.dataFactory.config;
  * @Project: phemex
  * @Package: com.phemex.dataFactory.config.SwaggerConfig
  * @Date: 2022年05月16日 14:38
- * @Description:
+ * @Description: Swagger配置类
  */
 
 
@@ -25,6 +25,9 @@ import springfox.documentation.spring.web.plugins.Docket;
 @Configuration
 public class SwaggerConfig extends WebMvcConfigurationSupport {
 
+    /**
+     * 配置 Swagger 文档生成器
+     */
     @Bean
     public Docket createRestApi() {
         return new Docket(DocumentationType.OAS_30)
@@ -35,6 +38,9 @@ public class SwaggerConfig extends WebMvcConfigurationSupport {
                 .build();
     }
 
+    /**
+     * 配置 Swagger 文档的基本信息，如标题、描述、联系方式等
+     */
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("dataFactory APIs")
@@ -44,7 +50,12 @@ public class SwaggerConfig extends WebMvcConfigurationSupport {
                 .version("1.0")
                 .build();
     }
-    //重点
+
+    /**
+     * 重点
+     * 配置 Swagger UI 资源处理器
+     * 访问/swagger-ui/index.html来查看生成的 Swagger API 文档
+     */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.

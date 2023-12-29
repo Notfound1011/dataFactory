@@ -1,7 +1,6 @@
 package com.phemex.dataFactory.mapper;
 
-import com.phemex.dataFactory.dto.LdapUserDTO;
-import org.apache.ibatis.annotations.Mapper;
+import com.phemex.dataFactory.response.LdapUserResp;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -16,11 +15,11 @@ import java.util.List;
  */
 @Repository
 public interface LdapMapper {
-    int insert(LdapUserDTO ldapUserDTO);
+    int insert(LdapUserResp ldapUserResp);
 
-    int updateByUser(LdapUserDTO ldapUserDTO);
+    int updateByUser(LdapUserResp ldapUserResp);
 
     Integer countByUser(@Param("user") String user);
 
-    List<LdapUserDTO> selectAll();
+    List<LdapUserResp> selectAll();
 }

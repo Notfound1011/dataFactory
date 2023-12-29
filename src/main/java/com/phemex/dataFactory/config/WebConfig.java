@@ -19,7 +19,7 @@ import java.net.ConnectException;
  * @author: yuyu.shi
  * @Project: phemex
  * @Date: 2022年04月17日 19:30
- * @Description:
+ * @Description: 配置 RestTemplate 的 WebConfig 类,
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -34,6 +34,7 @@ public class WebConfig implements WebMvcConfigurer {
         return getTimeOutTemplate(4000, 4000, 10 * 1000);
     }
 
+    // 设置 RestTemplate 的连接请求超时、连接超时和读取超时时间
     private RestTemplate getTimeOutTemplate(int requestTimeout, int connectTimeout, int readTimeout) {
         RestTemplate restTemplate = new RestTemplate();
         HttpComponentsClientHttpRequestFactory httpRequestFactory =
@@ -45,6 +46,7 @@ public class WebConfig implements WebMvcConfigurer {
         return restTemplate;
     }
 
+    // 实现 HttpClient 的重试机制，当发生 IO 异常时进行重试
     private HttpClientBuilder getHttpClientBuilder() {
         final int retryTimes = 3;
         final long retryIntervalTime = 1000L;

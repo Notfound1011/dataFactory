@@ -1,14 +1,12 @@
 package com.phemex.dataFactory.controller;
 
-import com.phemex.dataFactory.controller.request.UserRequest;
-import com.phemex.dataFactory.dto.RegistrationInfo;
-import com.phemex.dataFactory.dto.UserRegisterRequest;
+import com.phemex.dataFactory.response.RegistrationResp;
+import com.phemex.dataFactory.request.UserRegisterRequest;
 import com.phemex.dataFactory.service.UserRegisterService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -22,9 +20,9 @@ import java.util.List;
 @RestController
 @RequestMapping("user")
 public class UserRegisterController {
-    @ApiOperation(value = "批量注册", notes = "用户批量注册", httpMethod = "POST")
+    @ApiOperation(value = "用户批量注册", notes = "", httpMethod = "POST")
     @PostMapping("/register/batch")
-    public List<RegistrationInfo> registerUsers(@RequestBody UserRegisterRequest userRegisterRequest) throws Exception {
+    public List<RegistrationResp> registerUsers(@RequestBody UserRegisterRequest userRegisterRequest) throws Exception {
         return UserRegisterService.registerUsers(userRegisterRequest);
     }
 }

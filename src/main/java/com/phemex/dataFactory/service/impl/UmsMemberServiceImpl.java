@@ -1,8 +1,11 @@
 package com.phemex.dataFactory.service.impl;
 
-import com.phemex.dataFactory.controller.request.ResultHolder;
+import com.phemex.dataFactory.request.ResultHolder;
+import com.phemex.dataFactory.scheduler.ScheduledTask;
 import com.phemex.dataFactory.service.RedisService;
 import com.phemex.dataFactory.service.UmsMemberService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,8 +22,14 @@ import java.util.Random;
  */
 @Service
 public class UmsMemberServiceImpl implements UmsMemberService {
+    private final static Logger logger = LoggerFactory.getLogger(UmsMemberServiceImpl.class);
+    private final RedisService redisService;
+
     @Autowired
-    private RedisService redisService;
+    public UmsMemberServiceImpl(RedisService redisService) {
+        this.redisService = redisService;
+    }
+
     @Value("${redis.key.prefix.authCode}")
     private String REDIS_KEY_PREFIX_AUTH_CODE;
     @Value("${redis.key.expire.authCode}")

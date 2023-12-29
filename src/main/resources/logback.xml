@@ -5,7 +5,8 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!-- 格式化输出: %d: 日期; %-5level: 级别从左显示5个字符宽度; %thread: 线程名; %logger: 类名; %M: 方法名; %line: 行号; %msg: 日志消息; %n: 换行符 -->
-            <pattern>%yellow([%-5level]) [%d{yyyy-MM-dd HH:mm:ss.SSS}] %highlight([%X{X-B3-TraceId:-}] %red([%X{T}]) %boldMagenta([%logger{50}])) %cyan( [%line] - [%msg]%n)
+            <pattern>%yellow([%-5level]) [%d{yyyy-MM-dd HH:mm:ss.SSS}] %highlight([%X{X-B3-TraceId:-}] %red([%X{T}])
+                %boldMagenta([%logger{50}])) %cyan( [%line] - [%msg]%n)
             </pattern>
         </encoder>
     </appender>
@@ -135,19 +136,19 @@
         <appender-ref ref="warnAppender"/>
     </appender>
 
-    <logger name="com.phemex.dataFactory" additivity="false">
+    <logger name="com.phemex.dataFactory">
         <level value="INFO"/>
         <appender-ref ref="infoAsyncAppender"/>
         <appender-ref ref="warnAsyncAppender"/>
         <appender-ref ref="errorAsyncAppender"/>
     </logger>
 
-    <logger name="com.phemex.dataFactory.Application" additivity="false" level="INFO">
+    <logger name="com.phemex.dataFactory.Application" level="INFO">
         <appender-ref ref="infoAsyncAppender"/>
     </logger>
 
     <root level="INFO">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT"/>
     </root>
 
 </configuration>

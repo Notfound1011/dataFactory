@@ -1,6 +1,6 @@
 package com.phemex.dataFactory.mapper;
 
-import com.phemex.dataFactory.base.domain.UserGroup;
+import com.phemex.dataFactory.request.base.UserGroup;
 
 import java.util.List;
 

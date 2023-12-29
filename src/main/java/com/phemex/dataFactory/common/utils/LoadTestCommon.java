@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
@@ -48,7 +49,7 @@ public class LoadTestCommon {
     }
 
     private static final String[] US_IP_RANGES = {
-            "23.95.40.0","23.95.43.255"
+            "23.95.40.0", "23.95.43.255", "137.83.88.0", "137.83.89.255"
     };
 
     public static String getRandomIp() {
@@ -87,33 +88,29 @@ public class LoadTestCommon {
     }
 
     /**
-     * @Description: 给账号充值
+     * @Description: 划转
      * @Date: 2022/12/30
      **/
-    static void deposit(int amountRv, String currency) throws Exception {
-        BigDecimal amountToDeposit = BigDecimal.valueOf(amountRv);
-        // 参数校验
-        if (amountToDeposit == null || amountToDeposit.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Invalid amount to deposit: " + amountToDeposit);
-        }
+    static void transfer() throws Exception {
+
         // 设置读取文件的路径
-        String baseFilePath = "src/main/resources/input/user_login_info.csv";
-
+        String baseFilePath = "src/main/resources/output/secretKey.csv";
         BufferedReader bufReader = new BufferedReader(new InputStreamReader(new FileInputStream(baseFilePath)));//数据流读取文件
-        for (String str; (str = bufReader.readLine()) != null; ) {
-            HashMap<String, Object> body = new HashMap<>();
-            HashMap<String, Object> urlParam = new HashMap<>();
-            urlParam.put("userId", str.split(",")[0]);
-            urlParam.put("currency", currency);
-            BigDecimal amountEv = amountToDeposit.multiply(MULTIPLIER);
-            urlParam.put("amountEv", amountEv);
-            body.put("host", "https://fat.phemex.com");
-            body.put("path", "/api/spot/public/wallet");
-            body.put("urlParam", urlParam);
 
-            JSONObject jsonObj = new JSONObject(body);
-            System.out.println(jsonObj.toString());
-            String res = HttpClientUtil.jsonPost("http://3.1.250.199:8084/wallet/deposit", jsonObj.toString());
+        String path = "/assets/transfer";
+        String queryString = "";
+        String body = "{\"amountEv\": 1000000000000,\"currency\": \"USDT\",\"moveOp\": 2}";
+
+        for (String str; (str = bufReader.readLine()) != null; ) {
+            String secretKey = str.split(",")[2];
+
+            String signature = ClientUtils.sign(path, queryString, body, secretKey.getBytes());
+            String expiry = ClientUtils.expiry();
+            HashMap<String, String> headers = new HashMap<>();
+            headers.put("x-phemex-request-signature", signature);
+            headers.put("x-phemex-request-expiry", expiry);
+            headers.put("x-phemex-access-token", str.split(",")[1]);
+            String res = HttpClientUtil.jsonPost("https://fat-vapi.phemex.com" + path, body, headers);
             JSONObject json_res = (JSONObject) JSONObject.parse(res);
             System.out.println(json_res);
         }
@@ -129,13 +126,14 @@ public class LoadTestCommon {
      **/
     public static void writeToFile(String outputFilePath, String content, Boolean append) {
         try {
+            Path path = Paths.get(outputFilePath);
             if (append) {
                 // 向文件中追加内容
-                Files.writeString(Paths.get(outputFilePath), content, StandardOpenOption.APPEND);
+                Files.writeString(path, content, StandardOpenOption.APPEND);
                 System.out.println("内容已成功追加到文件。");
             } else {
                 // 替换文件内容
-                Files.writeString(Paths.get(outputFilePath), content);
+                Files.writeString(path, content);
             }
         } catch (IOException e) {
             System.out.println("写入文件时发生错误。");
@@ -150,7 +148,7 @@ public class LoadTestCommon {
      * @Param email: 登录用户名/邮箱
      * @Param password: 密码
      **/
-    static TokenInfo getTokenByLogin(HashMap<String, String> header, String email, String password) throws Exception {
+    public static TokenInfo getTokenByLogin(HashMap<String, String> header, String email, String password) throws Exception {
         // 设置请求体
         HashMap<String, Object> body = new HashMap<>();
         body.put("email", email);
@@ -158,21 +156,21 @@ public class LoadTestCommon {
         body.put("encryptVersion", 0);
         JSONObject jsonObj = new JSONObject(body);
 
-        String res = HttpClientUtil.jsonPost("https://fat3.phemex.com/api/phemex-user/users/login", jsonObj.toString(), header);
+        String res = HttpClientUtil.jsonPost("https://api10-fat2.phemex.com/phemex-user/users/login", jsonObj.toString(), header);
         JSONObject json_res = (JSONObject) JSONObject.parse(res);
         System.out.println(json_res);
 
         String code = (String) json_res.getJSONObject("data").get("code");
-        String url = "https://fat3.phemex.com/api/phemex-user/users/confirm/login" + "?code=" + code + "&mailCode=111111";
+        String url = "https://api10-fat2.phemex.com/phemex-user/users/confirm/login" + "?code=" + code + "&mailCode=111111";
         CloseableHttpResponse res2 = HttpClientUtil.httpGet(url, header);
         String responseHeader = res2.getFirstHeader("phemex-auth-token").getValue();
 
         return new TokenInfo(body, responseHeader);
     }
 
-    static class TokenInfo {
-        private final HashMap<String, Object> body;
-        private final String responseHeader;
+    public static class TokenInfo {
+        final HashMap<String, Object> body;
+        final String responseHeader;
 
         public TokenInfo(HashMap<String, Object> body, String responseHeader) {
             this.body = body;
@@ -188,4 +186,7 @@ public class LoadTestCommon {
         }
     }
 
+    public static void main(String[] args) throws Exception {
+        transfer();
+    }
 }

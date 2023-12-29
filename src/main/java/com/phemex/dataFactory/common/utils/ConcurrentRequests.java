@@ -1,13 +1,5 @@
 package com.phemex.dataFactory.common.utils;
 
-/**
- * @author: yuyu.shi
- * @Project: phemex
- * @Package: com.phemex.dataFactory.common.utils.ConcurrentRequests
- * @Date: 2023年06月09日 14:47
- * @Description:
- */
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,12 +16,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.phemex.dataFactory.common.utils.LoadTestCommon.*;
 import static com.phemex.dataFactory.common.utils.LoadTestCommon.getTokenByLogin;
 import static com.phemex.dataFactory.common.utils.PspMintBatch.*;
 
-
+/**
+ * @author: yuyu.shi
+ * @Project: phemex
+ * @Package: com.phemex.dataFactory.common.utils.ConcurrentRequests
+ * @Date: 2023年06月09日 14:47
+ * @Description:
+ */
 public class ConcurrentRequests {
     private static final int NUM_USERS = 50;
     private static final int CONCURRENT_ACCESS = 50;
@@ -37,10 +36,10 @@ public class ConcurrentRequests {
 
     public static void main(String[] args) throws IOException {
         // 登录获取tokens: 读取email,执行并发登录获取token的请求
-//        String inputFilePath = "src/main/resources/input/emails.txt";
-//        String methodName = "getTokenByLogin";
-//        String outputFilePath = "src/main/resources/output/tokens.txt";
-//        executeConcurrentRequests(inputFilePath, methodName, outputFilePath);
+        String inputFilePath = "src/main/resources/input/emails.txt";
+        String methodName = "getTokenByLogin";
+        String outputFilePath = "src/main/resources/output/tokens.txt";
+        executeConcurrentRequests(inputFilePath, methodName, outputFilePath);
 
 
         // stake: 读取tokens,执行并发stake请求
@@ -53,16 +52,22 @@ public class ConcurrentRequests {
         // 登录并执行其他请求: 执行并发loginAndOthers请求
 //        String inputFilePath = "src/main/resources/input/emails.txt";
 //        String methodName = "loginAndOthers";
-//        String outputFilePath = "src/main/resources/output/mintResults.txt";
+//        String outputFilePath = "src/main/resources/output/results.txt";
 //        executeConcurrentRequests(inputFilePath, methodName, outputFilePath);
 
 
         // stakeMock: 读取clientId,执行并发stakeMock请求
-        String inputFilePath = "src/main/resources/input/clientId.txt";
-        String methodName = "stakeMock";
-        String outputFilePath = "src/main/resources/output/stakeMockResults.txt";
-        executeConcurrentRequests(inputFilePath, methodName, outputFilePath);
+//        String inputFilePath = "src/main/resources/input/clientId.txt";
+//        String methodName = "stakeMock";
+//        String outputFilePath = "src/main/resources/output/stakeMockResults.txt";
+//        executeConcurrentRequests(inputFilePath, methodName, outputFilePath);
 
+
+        // redeem: 读取clientId,执行并发redeem请求
+//        String inputFilePath = "src/main/resources/input/clientId.txt";
+//        String methodName = "redeemMock";
+//        String outputFilePath = "src/main/resources/output/redeemMockResults.txt";
+//        executeConcurrentRequests(inputFilePath, methodName, outputFilePath);
     }
 
     private static void executeConcurrentRequests(String inputFilePath, String methodName, String outputFilePath) throws IOException {
@@ -100,8 +105,9 @@ public class ConcurrentRequests {
     }
 
     public static Set<String> readParamsFromFile(String filePath) throws IOException {
-        return Files.lines(Paths.get(filePath))
-                .collect(Collectors.toSet());
+        try (Stream<String> lines = Files.lines(Paths.get(filePath))) {
+            return lines.collect(Collectors.toSet());
+        }
     }
 
     private static String getRandomParam(List<String> params) {
@@ -112,10 +118,10 @@ public class ConcurrentRequests {
 }
 
 class RequestTask implements Runnable {
-    private String param;
-    private Semaphore semaphore;
-    private BufferedWriter writer;
-    private String methodName;
+    private final String param;
+    private final Semaphore semaphore;
+    private final BufferedWriter writer;
+    private final String methodName;
 
     public RequestTask(String param, Semaphore semaphore, BufferedWriter writer, String methodName) {
         this.param = param;
@@ -133,24 +139,38 @@ class RequestTask implements Runnable {
 //            System.out.println("Start Time: " + getCurrentTime());
 
             // 调用相应的方法
-            if (methodName.equals("getTokenByLogin")) {
-                // 设置请求头
-                HashMap<String, String> header = getHeader();
-                TokenInfo tokenInfo = getTokenByLogin(header, param, "Shiyu@123");
-                // 写入结果到文件
-                String result = tokenInfo.getResponseHeader();
-                writer.write(result + "\n");
-                writer.flush();
-            } else if (methodName.equals("stake")) {
-                String result = stake(param);
-                writer.write(result + "\n");
-                writer.flush();
-            } else if (methodName.equals("stakeMock")) {
-                String result = stakeMock(param);
-                writer.write(result + "\n");
-                writer.flush();
-            } else if (methodName.equals("loginAndOthers")) {
-                loginAndOthers(param);
+            switch (methodName) {
+                case "getTokenByLogin": {
+                    // 设置请求头
+                    HashMap<String, String> header = getHeader();
+                    TokenInfo tokenInfo = getTokenByLogin(header, param, "Shiyu@123");
+                    // 写入结果到文件
+                    String result = tokenInfo.getResponseHeader();
+                    writer.write(result + "\n");
+                    writer.flush();
+                    break;
+                }
+                case "stake": {
+                    String result = stake(param);
+                    writer.write(result + "\n");
+                    writer.flush();
+                    break;
+                }
+                case "stakeMock": {
+                    String result = stakeMock(param);
+                    writer.write(result + "\n");
+                    writer.flush();
+                    break;
+                }
+                case "loginAndOthers":
+                    loginAndOthers(param);
+                    break;
+                case "redeemMock": {
+                    String result = redeemMock(param);
+                    writer.write(result + "\n");
+                    writer.flush();
+                    break;
+                }
             }
 
 

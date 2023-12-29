@@ -25,7 +25,7 @@ public class LogUtil {
     /**
      * 初始化日志
      *
-     * @return
+     * @return Logger
      */
     public static Logger getLogger() {
         return LoggerFactory.getLogger(LogUtil.getLogClass());
@@ -184,10 +184,10 @@ public class LogUtil {
     }
 
     public static String getMsg(Object msg, Throwable ex) {
-        String str = "";
+        String str;
 
         if (msg != null) {
-            str = LogUtil.getLogMethod() + "[" + msg.toString() + "]";
+            str = LogUtil.getLogMethod() + "[" + msg + "]";
         } else {
             str = LogUtil.getLogMethod() + "[null]";
         }
@@ -205,7 +205,7 @@ public class LogUtil {
     /**
      * 得到调用类名称
      *
-     * @return
+     * @return String
      */
     private static String getLogClass() {
         String str = "";
@@ -222,7 +222,7 @@ public class LogUtil {
     /**
      * 得到调用方法名称
      *
-     * @return
+     * @return String
      */
     private static String getLogMethod() {
         String str = "";

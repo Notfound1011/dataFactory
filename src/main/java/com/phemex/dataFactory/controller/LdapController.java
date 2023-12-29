@@ -1,7 +1,7 @@
 package com.phemex.dataFactory.controller;
 
-import com.phemex.dataFactory.controller.request.ResultHolder;
-import com.phemex.dataFactory.dto.LdapUserDTO;
+import com.phemex.dataFactory.request.ResultHolder;
+import com.phemex.dataFactory.response.LdapUserResp;
 import com.phemex.dataFactory.service.LdapService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,7 +20,6 @@ import java.util.List;
  * @Date: 2022年05月11日 11:52
  * @Description:
  */
-
 @Api
 @RequestMapping("ldap")
 @RestController
@@ -36,7 +35,7 @@ public class LdapController {
 
     @ApiOperation(value = "查询ldap用户数据", notes = "查询ldap用户数据", httpMethod = "GET")
     @GetMapping("/getUsers")
-    public List<LdapUserDTO> getUsers() {
+    public List<LdapUserResp> getUsers() {
         return ldapService.selectAll();
     }
 }
