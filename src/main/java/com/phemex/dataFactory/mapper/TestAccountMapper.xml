@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.phemex.dataFactory.mapper.TestAccountMapper">
+    <resultMap id="TestAccountResultMap" type="com.phemex.dataFactory.model.TestAccount">
+        <id property="id" column="id"/>
+        <result property="owner" column="owner"/>
+        <result property="uid" column="uid"/>
+        <result property="email" column="email"/>
+        <result property="accessToken" column="access_token"/>
+        <result property="secretKey" column="secret_key"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+    <!-- 插入操作 -->
+    <insert id="insertSelective" parameterType="com.phemex.dataFactory.model.TestAccount">
+        INSERT INTO test_account (owner, uid, email, access_token, secret_key, created_at, updated_at)
+        VALUES (#{owner}, #{uid}, #{email}, #{accessToken}, #{secretKey}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <!-- 更新操作 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.phemex.dataFactory.model.TestAccount">
+        UPDATE test_account
+        <set>
+            <if test="uid != null">
+                uid = #{uid},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="accessToken != null">
+                access_token = #{accessToken},
+            </if>
+            <if test="secretKey != null">
+                secret_key = #{secretKey},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updatedAt != null">
+                updated_at = #{updatedAt},
+            </if>
+        </set>
+        WHERE uid = #{uid}
+    </update>
+
+    <!-- 根据主键查询 -->
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="TestAccountResultMap"
+            resultType="com.phemex.dataFactory.model.TestAccount">
+        SELECT *
+        FROM test_account
+        WHERE id = #{id}
+    </select>
+
+    <!-- 根据条件查询 -->
+    <select id="selectByKey" parameterType="com.phemex.dataFactory.model.TestAccount" resultMap="TestAccountResultMap"
+            resultType="com.phemex.dataFactory.model.TestAccount">
+        SELECT *
+        FROM test_account
+        WHERE 1=1
+        <if test="owner != null and owner != ''">
+            AND (owner = #{owner} OR owner = 'public')
+        </if>
+        <if test="email != null and email != ''">
+            AND email = #{email}
+        </if>
+        <if test="id != null">
+            AND id = #{id}
+        </if>
+        ORDER BY updated_at DESC
+    </select>
+
+    <!-- 根据邮箱和uid查询 -->
+    <select id="selectByEmailUid" parameterType="com.phemex.dataFactory.model.TestAccount" resultMap="TestAccountResultMap"
+            resultType="com.phemex.dataFactory.model.TestAccount">
+        SELECT *
+        FROM test_account
+        WHERE email = #{email}
+           OR uid = #{uid}
+    </select>
+</mapper>

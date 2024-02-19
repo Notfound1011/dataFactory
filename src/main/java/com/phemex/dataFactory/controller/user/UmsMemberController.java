@@ -1,11 +1,10 @@
-package com.phemex.dataFactory.controller;
+package com.phemex.dataFactory.controller.user;
 
 import com.phemex.dataFactory.request.ResultHolder;
-import com.phemex.dataFactory.service.UmsMemberService;
+import com.phemex.dataFactory.service.user.UmsMemberService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 /**
  * @author: yuyu.shi
  * @Project: phemex
- * @Package: com.phemex.dataFactory.controller.UmsMemberController
+ * @Package: com.phemex.dataFactory.controller.user.UmsMemberController
  * @Date: 2023年01月04日 10:52
  * @Description:
  */

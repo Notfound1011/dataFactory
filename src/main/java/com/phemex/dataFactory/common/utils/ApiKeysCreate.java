@@ -1,6 +1,6 @@
 package com.phemex.dataFactory.common.utils;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -80,13 +80,10 @@ public class ApiKeysCreate {
         createBody.put("ipAddresses", "");
         createBody.put("type", 0);
 
-        JSONObject jsonCreateObj = new JSONObject(createBody);
-        System.out.println(jsonCreateObj);
-
         String totpCode = generateTotp("4S6MKCZ6NG53AZHS");
         String url = "https://api10-fat2.phemex.com/phemex-user/users/keys/create?mailCode=&otpCode=" + totpCode;
-        String resCreate = HttpClientUtil.jsonPost(url, jsonCreateObj.toString(), header);
-        JSONObject jsonResCreate = (JSONObject) JSONObject.parse(resCreate);
+        String resCreate = HttpClientUtil.jsonPost(url, createBody, header);
+        JSONObject jsonResCreate = JSONObject.parseObject(resCreate);
         System.out.println("Api Create结果" + jsonResCreate);
 
         JSONObject data = jsonResCreate.getJSONObject("data");

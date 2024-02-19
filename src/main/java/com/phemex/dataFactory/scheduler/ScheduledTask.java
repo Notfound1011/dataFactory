@@ -20,7 +20,7 @@ public class ScheduledTask {
     private final static Logger logger = LoggerFactory.getLogger(ScheduledTask.class);
 
     //  fixedRate 是 long 类型，表示任务执行的间隔毫秒数，以上代码中的定时任务每 5 秒执行一次。
-    @Scheduled(cron="0 0 12 * * ?")
+    @Scheduled(cron="1 0 12 * * ?")
     public void scheduledTask() {
         String msg = "桃花坞裏桃花庵，桃花庵裏桃花仙。\n" +
                 "桃花仙人种桃树，又折花枝当酒钱。\n" +

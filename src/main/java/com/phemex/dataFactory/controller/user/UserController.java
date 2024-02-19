@@ -1,8 +1,8 @@
-package com.phemex.dataFactory.controller;
+package com.phemex.dataFactory.controller.user;
 
 import com.phemex.dataFactory.request.base.User;
 import com.phemex.dataFactory.request.UserRequest;
-import com.phemex.dataFactory.service.UserService;
+import com.phemex.dataFactory.service.user.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -13,11 +13,11 @@ import java.util.List;
 /**
  * @author: yuyu.shi
  * @Project: phemex
- * @Package: com.phemex.dataFactory.controller.UserController
+ * @Package: com.phemex.dataFactory.controller.user.UserController
  * @Date: 2022年09月01日 11:52
  * @Description:
  */
-@Api
+@Api(tags = "User")
 @RequestMapping("user")
 @RestController
 public class UserController {

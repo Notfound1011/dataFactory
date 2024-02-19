@@ -1,4 +1,4 @@
-package com.phemex.dataFactory.service;
+package com.phemex.dataFactory.service.user;
 
 import com.phemex.dataFactory.request.base.UserGroup;
 import com.phemex.dataFactory.mapper.UserGroupMapper;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author: yuyu.shi
  * @Project: phemex
- * @Package: com.phemex.dataFactory.service.UserGroupService
+ * @Package: com.phemex.dataFactory.service.user.UserGroupService
  * @Date: 2022年09月01日 11:52
  * @Description:
  */

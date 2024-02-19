@@ -1,9 +1,8 @@
 package com.phemex.dataFactory.service.impl;
 
 import com.phemex.dataFactory.request.ResultHolder;
-import com.phemex.dataFactory.scheduler.ScheduledTask;
 import com.phemex.dataFactory.service.RedisService;
-import com.phemex.dataFactory.service.UmsMemberService;
+import com.phemex.dataFactory.service.user.UmsMemberService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

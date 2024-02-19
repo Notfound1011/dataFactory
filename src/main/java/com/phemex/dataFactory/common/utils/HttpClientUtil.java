@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.alibaba.fastjson2.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -34,6 +36,11 @@ public class HttpClientUtil {
     // 请求获取数据的超时时间(即响应时间)，单位毫秒。
     private static final int SOCKET_TIMEOUT = 5000;
 
+    private static final RequestConfig requestConfig = RequestConfig.custom()
+            .setConnectTimeout(CONNECT_TIMEOUT)
+            .setSocketTimeout(SOCKET_TIMEOUT)
+            .build();
+
     /**
      * Description: get请求（适用于无请求头）
      *
@@ -55,54 +62,52 @@ public class HttpClientUtil {
         return post(url, params, null);
     }
 
-    /**
-     * Description: post请求（适用于请求体为json格式，无请求头）
-     *
-     * @param url    路径
-     * @param body json参数
-     * @return 响应结果
-     */
-    public static String jsonPost(String url, String body) throws Exception {
-        return jsonPost(url, body, null);
-    }
-
 
     /**
-     * Description: post请求（适用于有请求头，无请求体）
-     *
-     * @param url 路径
-     * @param headers 请求头信息
-     * @return 响应结果
-     */
-    public static String jsonPost(String url, Map<String, String> headers) throws Exception {
-        return jsonPost(url, null, headers);
-    }
-
-    /**
-     * Description: get请求
+     * Description: get请求 不带参数
      *
      * @param url     路径
      * @param headers 请求头信息
      * @return 响应结果
      */
     public static String get(String url, Map<String, String> headers) throws Exception {
-        CloseableHttpClient httpClient = null;
-        HttpGet httpGet;
-        CloseableHttpResponse httpResponse = null;
-        String result;
-        try {
-            httpClient = HttpClientBuilder.create().build();
+        HttpGet httpGet = new HttpGet(url);
+        return getRequest(headers, httpGet);
+    }
 
-            httpGet = new HttpGet(url);
-            //设置请求头
-            setHeader(headers, httpGet);
-            RequestConfig config = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
-            httpGet.setConfig(config);
-            result = getHttpClientResult(httpClient, httpGet);
-        } finally {
-            release(httpResponse, httpClient);
+    /*
+     * @Description: get请求 带参数
+     * @Date: 2024/1/6
+     * @Param url:
+     * @Param headers:
+     * @Param params:
+     **/
+    public static String get(String url, Map<String, String> headers, Map<String, Object> params) throws Exception {
+        URIBuilder uriBuilder = new URIBuilder(url);
+        if (params != null) {
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                uriBuilder.setParameter(entry.getKey(), String.valueOf(entry.getValue()));
+            }
         }
-        return result;
+        HttpGet httpGet = new HttpGet(uriBuilder.build());
+        return getRequest(headers, httpGet);
+    }
+
+    private static String getRequest(Map<String, String> headers, HttpGet httpGet) throws IOException {
+        CloseableHttpClient httpClient = null;
+        setHeader(headers, httpGet);
+        httpGet.setConfig(requestConfig);
+        httpClient = HttpClientBuilder.create().build();
+        try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+            // Check the response status and handle accordingly
+            if (response.getStatusLine().getStatusCode() == 200) {
+                return EntityUtils.toString(response.getEntity());
+            } else {
+                throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+            }
+        } finally {
+            release(null, httpClient);
+        }
     }
 
 
@@ -123,8 +128,7 @@ public class HttpClientUtil {
             httpGet = new HttpGet(url);
             //设置请求头
             setHeader(headers, httpGet);
-            RequestConfig config = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
-            httpGet.setConfig(config);
+            httpGet.setConfig(requestConfig);
             httpResponse = httpClient.execute(httpGet);
 //            result = getHttpClientResult(httpResponse, httpClient, httpGet);
         } finally {
@@ -145,7 +149,6 @@ public class HttpClientUtil {
     public static String post(String url, Map<String, Object> params, Map<String, String> headers) throws Exception {
         CloseableHttpClient httpClient = null;
         HttpPost httpPost;
-        CloseableHttpResponse httpResponse = null;
         String result;
         try {
             httpClient = HttpClientBuilder.create().build();
@@ -155,15 +158,48 @@ public class HttpClientUtil {
             //设置参数
             setParam(params, httpPost);
 
-            RequestConfig config = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
-            httpPost.setConfig(config);
+            httpPost.setConfig(requestConfig);
 
             result = getHttpClientResult(httpClient, httpPost);
 //            httpResponse = httpClient.execute(httpPost);
         } finally {
-            release(httpResponse, httpClient);
+            release(null, httpClient);
         }
         return result;
+    }
+
+
+    /*
+     * @Description: Post请求，返回值类型为CloseableHttpResponse
+     * @Date: 2024/1/6
+     * @Param url:
+     * @Param body:
+     * @Param headers:
+     * @return CloseableHttpResponse
+     **/
+    public static CloseableHttpResponse httpPost(String url, Map<String, Object> body, Map<String, String> headers) throws Exception {
+        CloseableHttpClient httpClient = null;
+        HttpPost httpPost;
+        CloseableHttpResponse httpResponse = null;
+        try {
+            httpClient = HttpClientBuilder.create().build();
+            httpPost = new HttpPost(url);
+            httpPost.addHeader("Content-type", "application/json; charset=utf-8");
+            httpPost.setHeader("Accept", "application/json");
+            //设置请求头
+            setHeader(headers, httpPost);
+            //设置参数
+            if (body != null && !body.isEmpty()) {
+                String json = JSONObject.toJSONString(body);
+                StringEntity stringEntity = new StringEntity(json, "UTF-8");
+                httpPost.setEntity(stringEntity);
+            }
+            httpPost.setConfig(requestConfig);
+            httpResponse = httpClient.execute(httpPost);
+        } finally {
+            release(null, httpClient);
+        }
+        return httpResponse;
     }
 
 
@@ -171,14 +207,13 @@ public class HttpClientUtil {
      * Description: post请求（用于请求json格式的参数）
      *
      * @param url     路径
-     * @param body  json请求参数
+     * @param body    json请求参数为String类型
      * @param headers 请求头信息
      * @return 响应结果
      */
     public static String jsonPost(String url, String body, Map<String, String> headers) throws Exception {
         CloseableHttpClient httpClient = null;
         HttpPost httpPost;
-        CloseableHttpResponse httpResponse = null;
         String result;
         try {
             httpClient = HttpClientBuilder.create().build();
@@ -188,18 +223,76 @@ public class HttpClientUtil {
             //设置请求头
             setHeader(headers, httpPost);
             //设置参数
-            if(body != null){
+            if (body != null) {
                 httpPost.setEntity(new StringEntity(body, ENCODING));
             }
-            RequestConfig config = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
-            httpPost.setConfig(config);
+            httpPost.setConfig(requestConfig);
 
             result = getHttpClientResult(httpClient, httpPost);
         } finally {
-            release(httpResponse, httpClient);
+            release(null, httpClient);
         }
         return result;
     }
+
+
+    /**
+     * Description: post请求（用于请求json格式的参数）
+     *
+     * @param url     路径
+     * @param body    json请求参数为Map类型
+     * @param headers 请求头信息
+     * @return 响应结果
+     */
+    public static String jsonPost(String url, Map<String, Object> body, Map<String, String> headers) throws Exception {
+        CloseableHttpClient httpClient = null;
+        HttpPost httpPost;
+        String result;
+        try {
+            httpClient = HttpClientBuilder.create().build();
+            httpPost = new HttpPost(url);
+            httpPost.addHeader("Content-type", "application/json; charset=utf-8");
+            httpPost.setHeader("Accept", "application/json");
+            //设置请求头
+            setHeader(headers, httpPost);
+            String jsonBody = JSONObject.toJSONString(body);
+            //设置参数
+            if (body != null) {
+                httpPost.setEntity(new StringEntity(jsonBody, ENCODING));
+            }
+            httpPost.setConfig(requestConfig);
+
+            result = getHttpClientResult(httpClient, httpPost);
+        } finally {
+            release(null, httpClient);
+        }
+        return result;
+    }
+
+
+    /**
+     * Description: post请求（适用于请求体为json格式，无请求头）
+     *
+     * @param url  路径
+     * @param body json参数
+     * @return 响应结果
+     */
+    public static String jsonPost(String url, String body) throws Exception {
+        return jsonPost(url, body, null);
+    }
+
+
+    /**
+     * Description: post请求（适用于有请求头，无请求体）
+     *
+     * @param url     路径
+     * @param headers 请求头信息
+     * @return String 响应结果
+     */
+    public static String jsonPost(String url, Map<String, String> headers) throws Exception {
+        return jsonPost(url, "", headers);
+    }
+
 
     /**
      * @Description: PUT请求
@@ -212,7 +305,6 @@ public class HttpClientUtil {
     public static String put(String url, Map<String, Object> urlParams, Map<String, Object> params, Map<String, String> headers) throws Exception {
         CloseableHttpClient httpClient = null;
         HttpPut httpPut;
-        CloseableHttpResponse httpResponse = null;
         String result;
         try {
             httpClient = HttpClientBuilder.create().build();
@@ -226,13 +318,36 @@ public class HttpClientUtil {
             //设置参数
             setParam(params, httpPut);
 
-            RequestConfig config = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
-            httpPut.setConfig(config);
+            httpPut.setConfig(requestConfig);
             result = getHttpClientResult(httpClient, httpPut);
         } finally {
-            release(httpResponse, httpClient);
+            release(null, httpClient);
         }
         return result;
+    }
+
+    public static CloseableHttpResponse httpPut(String url, Map<String, Object> urlParams, Map<String, Object> params, Map<String, String> headers) throws Exception {
+        CloseableHttpClient httpClient = null;
+        HttpPut httpPut;
+        CloseableHttpResponse httpResponse = null;
+        try {
+            httpClient = HttpClientBuilder.create().build();
+            if (null != urlParams) {
+                httpPut = new HttpPut(url + "?" + setUrlParam(urlParams));
+            } else {
+                httpPut = new HttpPut(url);
+            }
+            //设置请求头
+            setHeader(headers, httpPut);
+            //设置参数
+            setParam(params, httpPut);
+
+            httpPut.setConfig(requestConfig);
+            httpResponse = httpClient.execute(httpPut);
+        } finally {
+            release(null, httpClient);
+        }
+        return httpResponse;
     }
 
     /**
@@ -258,7 +373,7 @@ public class HttpClientUtil {
      */
     public static void setParam(Map<String, Object> params, HttpEntityEnclosingRequestBase httpMethod) throws UnsupportedEncodingException {
         List<NameValuePair> list = mapToList(params);
-        if (list.size() > 0) {
+        if (!list.isEmpty()) {
             UrlEncodedFormEntity entity = new UrlEncodedFormEntity(list, ENCODING);
             httpMethod.setEntity(entity);
         }

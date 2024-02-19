@@ -61,8 +61,12 @@ public class ResultHolder {
         this.data = data;
     }
 
-    public static ResultHolder success(Object obj) {
-        return new ResultHolder(obj);
+    public static ResultHolder success(Object data) {
+        return new ResultHolder(true, "OK", data);
+    }
+
+    public static ResultHolder success(String msg, Object data) {
+        return new ResultHolder(true, msg, data);
     }
 
     public static ResultHolder error(String message) {

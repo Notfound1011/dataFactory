@@ -1,8 +1,8 @@
-package com.phemex.dataFactory.controller;
+package com.phemex.dataFactory.controller.user;
 
 import com.phemex.dataFactory.request.ResultHolder;
 import com.phemex.dataFactory.response.LdapUserResp;
-import com.phemex.dataFactory.service.LdapService;
+import com.phemex.dataFactory.service.user.LdapService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ import java.util.List;
  * @Date: 2022年05月11日 11:52
  * @Description:
  */
-@Api
+@Api(tags = "User")
 @RequestMapping("ldap")
 @RestController
 public class LdapController {

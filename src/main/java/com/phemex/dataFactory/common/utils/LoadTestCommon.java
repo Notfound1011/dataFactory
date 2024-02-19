@@ -1,7 +1,10 @@
 package com.phemex.dataFactory.common.utils;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -13,7 +16,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+
+import static com.phemex.dataFactory.common.utils.GoogleAuthenticator.generateTotp;
 
 /**
  * @author: yuyu.shi
@@ -23,7 +29,8 @@ import java.util.Random;
  * @Description:
  */
 public class LoadTestCommon {
-    public static final String BID = "c083fccb-ee0d-88e9-b344-cf1ae6623875";
+    private static final Logger log = LoggerFactory.getLogger(LoadTestCommon.class);
+    public static final String BID = "98620c53-c285-4dfc-4ac9-145d2d1a55f1";
     public static final String LOAD_TEST_STR_V1 = "5ef9cfe9-ca67-412c7-9b9c-54a2b49ba35";
     public static final String LOAD_TEST_STR_V2 = "YisL1YpNZU-fea-RfNESJTkK-rb49-ba35";
     public static final String SECRET = "SoV~Yf@-12fd2x!r[Nv]^s*b";
@@ -49,42 +56,40 @@ public class LoadTestCommon {
     }
 
     private static final String[] US_IP_RANGES = {
-            "23.95.40.0", "23.95.43.255", "137.83.88.0", "137.83.89.255"
+            "2.0.0.0", "2.255.255.255", "46.0.0.0", "46.255.255.255"
     };
 
     public static String getRandomIp() {
         Random random = new Random();
-        int rangeIndex = random.nextInt(US_IP_RANGES.length / 2); // Select a random range
-        String startIP = US_IP_RANGES[rangeIndex * 2];
-        String endIP = US_IP_RANGES[rangeIndex * 2 + 1];
+        // Select either the first range (0) or the second range (1)
+        int rangeIndex = random.nextInt(US_IP_RANGES.length / 2) * 2;
+        String startIP = US_IP_RANGES[rangeIndex];
+        String endIP = US_IP_RANGES[rangeIndex + 1];
 
         long startIPValue = ipToLong(startIP);
         long endIPValue = ipToLong(endIP);
 
-        long randomIPValue = startIPValue + random.nextLong() % (endIPValue - startIPValue + 1);
+        // Generate a random IP within the selected range
+        long randomIPValue = startIPValue + (long) (random.nextDouble() * (endIPValue - startIPValue));
         return longToIP(randomIPValue);
     }
 
     private static long ipToLong(String ipAddress) {
-        String[] ipAddressParts = ipAddress.split("\\.");
+        String[] ipAddressInArray = ipAddress.split("\\.");
         long result = 0;
-        for (int i = 0; i < 4; i++) {
-            long octet = Long.parseLong(ipAddressParts[i]);
-            result += octet << (24 - (8 * i));
+        for (int i = 0; i < ipAddressInArray.length; i++) {
+            int power = 3 - i;
+            int ip = Integer.parseInt(ipAddressInArray[i]);
+            result += ((long) ip) << (power * 8);
         }
         return result;
     }
 
-    private static String longToIP(long ip) {
-        StringBuilder ipAddress = new StringBuilder();
-        for (int i = 3; i >= 0; i--) {
-            long octet = (ip >> (i * 8)) & 0xFF;
-            ipAddress.append(octet);
-            if (i > 0) {
-                ipAddress.append(".");
-            }
-        }
-        return ipAddress.toString();
+    private static String longToIP(long ipNumber) {
+        return ((ipNumber >> 24) & 0xFF) + "." +
+                ((ipNumber >> 16) & 0xFF) + "." +
+                ((ipNumber >> 8) & 0xFF) + "." +
+                (ipNumber & 0xFF);
     }
 
     /**
@@ -111,10 +116,47 @@ public class LoadTestCommon {
             headers.put("x-phemex-request-expiry", expiry);
             headers.put("x-phemex-access-token", str.split(",")[1]);
             String res = HttpClientUtil.jsonPost("https://fat-vapi.phemex.com" + path, body, headers);
-            JSONObject json_res = (JSONObject) JSONObject.parse(res);
-            System.out.println(json_res);
+            JSONObject json_res = JSONObject.parseObject(res);
         }
         bufReader.close();
+    }
+
+    /*
+     * @Description: 构建pubApi请求的headers
+     * @Date: 2024/1/8
+     * @Param path: 请求接口路径
+     * @Param queryString: url后跟的参数
+     * @Param body: body请求参数
+     * @Param secretKey:
+     * @Param accessToken:
+     **/
+    public static HashMap<String, String> headersPubApi(String path, String queryString, String body, String secretKey, String accessToken) {
+        String expiry = ClientUtils.expiry();
+        String signature = ClientUtils.sign(path, queryString, body, secretKey.getBytes());
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("x-phemex-request-expiry", expiry);
+        headers.put("x-phemex-request-signature", signature);
+        headers.put("x-phemex-access-token", accessToken);
+        return headers;
+    }
+
+
+    public static String buildQueryString(Map<String, Object> params) {
+        StringBuilder query = new StringBuilder();
+        boolean first = true;
+
+        for (Map.Entry<String, Object> entry : params.entrySet()) {
+            if (first) {
+                first = false;
+            } else {
+                query.append("&");
+            }
+            query.append(entry.getKey())
+                    .append("=")
+                    .append(entry.getValue());
+        }
+
+        return query.toString();
     }
 
     /**
@@ -142,7 +184,7 @@ public class LoadTestCommon {
     }
 
     /**
-     * @Description: 通过登录获取token
+     * @Description: 免OTP登录获取token
      * @Date: 2022/12/30
      * @Param header: 请求头
      * @Param email: 登录用户名/邮箱
@@ -150,22 +192,59 @@ public class LoadTestCommon {
      **/
     public static TokenInfo getTokenByLogin(HashMap<String, String> header, String email, String password) throws Exception {
         // 设置请求体
+        Result result = getResult(header, email, password);
+        String url = "https://api10-fat2.phemex.com/phemex-user/users/confirm/login" + "?code=" + result.code + "&mailCode=111111";
+        CloseableHttpResponse res = HttpClientUtil.httpGet(url, header);
+        System.out.println(EntityUtils.toString(res.getEntity()));
+        String responseHeader = res.getFirstHeader("phemex-auth-token").getValue();
+
+        return new TokenInfo(result.body, responseHeader);
+    }
+
+    /*
+     * @Description: 通过OTP登录获取token
+     * @Date: 2024/1/6
+     * @Param header: 请求头
+     * @Param email: 登录用户名/邮箱
+     * @Param password: 密码
+     * @Param totpSecret: OTP
+     **/
+    public static TokenInfo getTokenByLogin(HashMap<String, String> header, String email, String password, String totpSecret) throws Exception {
+        Result result = getResult(header, email, password);
+        String totpCode = generateTotp(totpSecret);
+
+        String url = "https://api10-fat2.phemex.com/phemex-user/users/v2/confirm/login";
+        HashMap<String, Object> body = new HashMap<>();
+        body.put("code", result.code);
+        body.put("otpCode", totpCode);
+        CloseableHttpResponse res2 = HttpClientUtil.httpPost(url, body, header);
+        String responseHeader = res2.getFirstHeader("phemex-auth-token").getValue();
+        return new TokenInfo(result.body, responseHeader);
+    }
+
+    private static Result getResult(HashMap<String, String> header, String email, String password) throws Exception {
+        // 设置请求体
+        log.info(email + password + header.toString());
         HashMap<String, Object> body = new HashMap<>();
         body.put("email", email);
         body.put("password", password);
         body.put("encryptVersion", 0);
-        JSONObject jsonObj = new JSONObject(body);
 
-        String res = HttpClientUtil.jsonPost("https://api10-fat2.phemex.com/phemex-user/users/login", jsonObj.toString(), header);
-        JSONObject json_res = (JSONObject) JSONObject.parse(res);
-        System.out.println(json_res);
+        String res = HttpClientUtil.jsonPost("https://api10-fat2.phemex.com/phemex-user/users/login", body, header);
+        JSONObject json_res = JSONObject.parseObject(res);
+        String code = json_res.getJSONObject("data").getString("code");
+        Result result = new Result(body, code);
+        return result;
+    }
 
-        String code = (String) json_res.getJSONObject("data").get("code");
-        String url = "https://api10-fat2.phemex.com/phemex-user/users/confirm/login" + "?code=" + code + "&mailCode=111111";
-        CloseableHttpResponse res2 = HttpClientUtil.httpGet(url, header);
-        String responseHeader = res2.getFirstHeader("phemex-auth-token").getValue();
+    private static class Result {
+        public final HashMap<String, Object> body;
+        public final String code;
 
-        return new TokenInfo(body, responseHeader);
+        public Result(HashMap<String, Object> body, String code) {
+            this.body = body;
+            this.code = code;
+        }
     }
 
     public static class TokenInfo {
@@ -187,6 +266,7 @@ public class LoadTestCommon {
     }
 
     public static void main(String[] args) throws Exception {
-        transfer();
+//        transfer();
+        System.out.println(getRandomIp());
     }
 }

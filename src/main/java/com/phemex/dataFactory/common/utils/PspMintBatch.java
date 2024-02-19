@@ -1,16 +1,15 @@
 package com.phemex.dataFactory.common.utils;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.phemex.dataFactory.request.UserRegisterRequest;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import static com.phemex.dataFactory.common.utils.EthereumWalletGenerator.genWalletAddress;
 import static com.phemex.dataFactory.common.utils.LoadTestCommon.*;
 import static com.phemex.dataFactory.common.utils.RequestTask.getCurrentTime;
-import static com.phemex.dataFactory.service.UserRegisterService.registerUsers;
+import static com.phemex.dataFactory.service.user.UserRegisterService.registerUsers;
 
 /**
  * @author: yuyu.shi
@@ -117,15 +116,12 @@ public class PspMintBatch {
         bindBody.put("address", address);
         bindBody.put("source", "Phemex");
 
-        JSONObject jsonbindObj = new JSONObject(bindBody);
-        System.out.println(jsonbindObj);
-
-        String resBind = HttpClientUtil.jsonPost("https://api10-fat.phemex.com/phemex-account/soul-pass/wallets/bind", jsonbindObj.toString(), header);
-        JSONObject jsonResBind = (JSONObject) JSONObject.parse(resBind);
+        String resBind = HttpClientUtil.jsonPost("https://api10-fat.phemex.com/phemex-account/soul-pass/wallets/bind", bindBody, header);
+        JSONObject jsonResBind = JSONObject.parseObject(resBind);
         System.out.println("bind结果" + jsonResBind);
 
         String resMint = HttpClientUtil.jsonPost("https://api10-fat.phemex.com/phemex-account/soul-pass/mint", header);
-        JSONObject jsonResMint = (JSONObject) JSONObject.parse(resMint);
+        JSONObject jsonResMint = JSONObject.parseObject(resMint);
         System.out.println("mint结果" + jsonResMint);
     }
 
@@ -147,12 +143,10 @@ public class PspMintBatch {
         stakeBody.put("expiryTime", 1687910400000L);
         stakeBody.put("gasFeeRq", 0.41666667);
 
-        JSONObject jsonstakeObj = new JSONObject(stakeBody);
-
         // 打印请求开始时间
         System.out.println("Start Time: " + getCurrentTime());
-        String resStake = HttpClientUtil.jsonPost("https://api10-fat2.phemex.com/phemex-stake/stake", jsonstakeObj.toString(), header);
-        JSONObject jsonResStake = (JSONObject) JSONObject.parse(resStake);
+        String resStake = HttpClientUtil.jsonPost("https://api10-fat2.phemex.com/phemex-stake/stake", stakeBody, header);
+        JSONObject jsonResStake = JSONObject.parseObject(resStake);
         System.out.println("stake结果" + jsonResStake);
         return jsonResStake.toString();
     }
@@ -168,13 +162,12 @@ public class PspMintBatch {
         stakeBody.put("expiryTime", 1687046400000L);
         stakeBody.put("gasFeeRq", 0.41666667);
 
-        JSONObject jsonStakeObj = new JSONObject(stakeBody);
 
         // 打印请求开始时间
         System.out.println("Start Time: " + getCurrentTime());
         String url = "https://api10-fat2.phemex.com/phemex-stake/public/robot/stake?userId=" + clientId;
-        String resStake = HttpClientUtil.jsonPost(url, jsonStakeObj.toString(), header);
-        JSONObject jsonResStake = (JSONObject) JSONObject.parse(resStake);
+        String resStake = HttpClientUtil.jsonPost(url, stakeBody, header);
+        JSONObject jsonResStake = JSONObject.parseObject(resStake);
         System.out.println("stakeMock结果: " + jsonResStake);
         return url + jsonResStake.toString();
     }
@@ -187,10 +180,9 @@ public class PspMintBatch {
         HashMap<String, Object> redeemBody = new HashMap<>();
         redeemBody.put("projectKey", "PT-STAKE");
 
-        JSONObject jsonRedeemObj = new JSONObject(redeemBody);
         String url = "https://api10-fat2.phemex.com/phemex-stake/public/robot/redeem?userId=" + clientId;
-        String resRedeem = HttpClientUtil.jsonPost(url, jsonRedeemObj.toString(), header);
-        JSONObject jsonResRedeem = (JSONObject) JSONObject.parse(resRedeem);
+        String resRedeem = HttpClientUtil.jsonPost(url, redeemBody, header);
+        JSONObject jsonResRedeem = JSONObject.parseObject(resRedeem);
         System.out.println("redeem结果" + jsonResRedeem);
         return url + jsonResRedeem.toString();
     }
@@ -202,10 +194,8 @@ public class PspMintBatch {
         HashMap<String, Object> redeemBody = new HashMap<>();
         redeemBody.put("projectKey", "PT-STAKE");
 
-        JSONObject jsonRedeemObj = new JSONObject(redeemBody);
-
-        String resRedeem = HttpClientUtil.jsonPost("https://api10-fat2.phemex.com/phemex-stake/redeem", jsonRedeemObj.toString(), header);
-        JSONObject jsonResRedeem = (JSONObject) JSONObject.parse(resRedeem);
+        String resRedeem = HttpClientUtil.jsonPost("https://api10-fat2.phemex.com/phemex-stake/redeem", redeemBody, header);
+        JSONObject jsonResRedeem = JSONObject.parseObject(resRedeem);
         System.out.println("redeem结果" + jsonResRedeem);
     }
 
@@ -213,7 +203,7 @@ public class PspMintBatch {
         header.put("phemex-auth-token", responseHeader);
 
         String resMarginOpen= HttpClientUtil.jsonPost("https://api10-fat2.phemex.com/phemex-account/accounts/margin/open", header);
-        JSONObject jsonMarginOpen = (JSONObject) JSONObject.parse(resMarginOpen);
+        JSONObject jsonMarginOpen = JSONObject.parseObject(resMarginOpen);
         System.out.println("MarginOpen结果：" + jsonMarginOpen);
     }
 }

@@ -1,6 +1,6 @@
-package com.phemex.dataFactory.service;
+package com.phemex.dataFactory.service.user;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.phemex.dataFactory.common.utils.HttpClientUtil;
 import com.phemex.dataFactory.common.utils.PspMintBatch;
 import com.phemex.dataFactory.response.RegistrationResp;
@@ -18,7 +18,7 @@ import static com.phemex.dataFactory.common.utils.LoadTestCommon.writeToFile;
 /**
  * @author: yuyu.shi
  * @Project: phemex
- * @Package: com.phemex.dataFactory.service.UserRegisterService
+ * @Package: com.phemex.dataFactory.service.user.UserRegisterService
  * @Date: 2023年06月12日 09:58
  * @Description:
  */
@@ -88,17 +88,16 @@ public class UserRegisterService {
         body.put("nickName", "");
         body.put("lang", "en");
         body.put("group", 0);
-        JSONObject jsonObj = new JSONObject(body);
 
-        String res = HttpClientUtil.jsonPost(API_REGISTER, jsonObj.toString(), header);
-        JSONObject jsonRes = (JSONObject) JSONObject.parse(res);
+        String res = HttpClientUtil.jsonPost(API_REGISTER, body, header);
+        JSONObject jsonRes = JSONObject.parseObject(res);
         logger.info("Register header: {}", header);
         logger.info("Register info: {}", jsonRes);
         String code = (String) jsonRes.getJSONObject("data").get("code");
 
         String confirmUrl = API_CONFIRM_REGISTER + "?code=" + code + "&mailCode=111111" + "&email=" + email;
         String response = HttpClientUtil.get(confirmUrl, header);
-        JSONObject jsonConfirmRes = (JSONObject) JSONObject.parse(response);
+        JSONObject jsonConfirmRes = JSONObject.parseObject(response);
         logger.info("Register confirm info: {}", jsonConfirmRes);
         return jsonConfirmRes;
     }

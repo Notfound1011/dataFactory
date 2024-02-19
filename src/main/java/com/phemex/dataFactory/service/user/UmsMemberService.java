@@ -1,11 +1,11 @@
-package com.phemex.dataFactory.service;
+package com.phemex.dataFactory.service.user;
 
 import com.phemex.dataFactory.request.ResultHolder;
 
 /**
  * @author: yuyu.shi
  * @Project: phemex
- * @Package: com.phemex.dataFactory.service.UmsMemberService
+ * @Package: com.phemex.dataFactory.service.user.UmsMemberService
  * @Date: 2023年01月04日 10:41
  * @Description: 会员管理Service
  */

@@ -1,4 +1,4 @@
-package com.phemex.dataFactory.service;
+package com.phemex.dataFactory.service.user;
 
 import com.phemex.dataFactory.common.utils.LogUtil;
 import com.phemex.dataFactory.config.LdapProperties;
@@ -20,7 +20,7 @@ import java.util.*;
 /**
  * @author: yuyu.shi
  * @Project: phemex
- * @Package: com.phemex.dataFactory.service.LdapService
+ * @Package: com.phemex.dataFactory.service.user.LdapService
  * @Date: 2022年05月12日 15:07
  * @Description:
  */

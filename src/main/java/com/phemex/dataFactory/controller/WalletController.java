@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
  * @Date: 2022年04月17日 19:30
  * @Description:
  */
-@Api
+@Api(tags = "Wallet")
 @RestController
 @RequestMapping("wallet")
 public class WalletController {

@@ -1,4 +1,4 @@
-package com.phemex.dataFactory.service;
+package com.phemex.dataFactory.service.user;
 
 import com.phemex.dataFactory.request.base.User;
 import com.phemex.dataFactory.request.base.UserExample;
@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * @author: yuyu.shi
  * @Project: phemex
- * @Package: com.phemex.dataFactory.service.UserService
+ * @Package: com.phemex.dataFactory.service.user.UserService
  * @Date: 2022年09月01日 11:52
  * @Description:
  */

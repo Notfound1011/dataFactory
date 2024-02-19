@@ -1,6 +1,6 @@
 package com.phemex.dataFactory.common.utils;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 
 import java.io.*;
 import java.util.*;
@@ -41,7 +41,7 @@ public class CopyTraderBatch {
                  **/
 //            String applicationBody = "{\"role\":\"Copier\"}";
 //            String res = HttpClientUtil.jsonPost("https://api10-fat.phemex.com/phemex-lb/user/application", applicationBody, header);
-//            JSONObject json_res = (JSONObject) JSONObject.parse(res);
+//            JSONObject json_res = JSONObject.parseObject(res);
 //            System.out.println(json_res);
 
 
@@ -52,10 +52,8 @@ public class CopyTraderBatch {
                 transferBody.put("fromAccType", "SPOT");
                 transferBody.put("toAccType", "COPY_TRADE");
 
-                JSONObject jsonObj = new JSONObject(transferBody);
-
-                String resTransfer = HttpClientUtil.jsonPost("https://api10-fat.phemex.com/exchanger-core/wallets/account/transfer", jsonObj.toString(), header);
-                JSONObject jsonResTransfer = (JSONObject) JSONObject.parse(resTransfer);
+                String resTransfer = HttpClientUtil.jsonPost("https://api10-fat.phemex.com/exchanger-core/wallets/account/transfer", transferBody, header);
+                JSONObject jsonResTransfer = JSONObject.parseObject(resTransfer);
                 System.out.println(jsonResTransfer);
             }
         }
@@ -81,7 +79,7 @@ public class CopyTraderBatch {
                 String copySettings = Math.random() < 0.5 ? copySettingsRatio : copySettingsFixed;
                 String resCopySettings = HttpClientUtil.
                         jsonPost("https://api10-fat.phemex.com/phemex-lb/copier/v3/setting", copySettings, header);
-                JSONObject jsonResCopySettings = (JSONObject) JSONObject.parse(resCopySettings);
+                JSONObject jsonResCopySettings = JSONObject.parseObject(resCopySettings);
                 System.out.println(jsonResCopySettings);
 
                 String copySettingsRatio2 = "{\"traderId\":\"930440\",\"symbols\":[{\"code\":41541,\"symbol\":\"BTCUSDT\",\"selected\":true},{\"code\":41641,\"symbol\":\"ETHUSDT\",\"selected\":true},{\"code\":41741,\"symbol\":\"XRPUSDT\",\"selected\":true},{\"code\":48741,\"symbol\":\"MATICUSDT\",\"selected\":true},{\"code\":63841,\"symbol\":\"ARBUSDT\",\"selected\":true},{\"code\":41941,\"symbol\":\"SOLUSDT\",\"selected\":true},{\"code\":44941,\"symbol\":\"DOGEUSDT\",\"selected\":true},{\"code\":47441,\"symbol\":\"FTMUSDT\",\"selected\":true},{\"code\":49441,\"symbol\":\"APTUSDT\",\"selected\":true},{\"code\":41841,\"symbol\":\"ADAUSDT\",\"selected\":true}],\"marginMode\":\"FOLLOW\",\"leverageType\":\"FOLLOW\",\"leverageRr\":0,\"amountType\":\"RATIO\",\"maxOpenAmountRv\":\"100422.2555\",\"singleInvestRatio\":\"2\"}";
@@ -89,7 +87,7 @@ public class CopyTraderBatch {
                 String copySettings2 = Math.random() < 0.5 ? copySettingsRatio2 : copySettingsFixed2;
                 String resCopySettings2 = HttpClientUtil.
                         jsonPost("https://api10-fat.phemex.com/phemex-lb/copier/v3/setting", copySettings2, header);
-                JSONObject jsonResCopySettings2 = (JSONObject) JSONObject.parse(resCopySettings2);
+                JSONObject jsonResCopySettings2 = JSONObject.parseObject(resCopySettings2);
                 System.out.println(jsonResCopySettings2);
             }
         }

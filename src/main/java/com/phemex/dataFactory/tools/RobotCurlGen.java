@@ -8,7 +8,7 @@ package com.phemex.dataFactory.tools;
  * @Description: Robot Faker Deposit and Transfer curl命令生成
  */
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
