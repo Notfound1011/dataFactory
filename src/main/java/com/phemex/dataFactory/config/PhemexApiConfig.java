@@ -19,7 +19,7 @@ public class PhemexApiConfig {
     @Bean
     public Map<String, String> phemexHostMap() {
         Map<String, String> hostMap = new HashMap<>();
-        hostMap.put("fat", "https://fat.phemex.com");
+        hostMap.put("fat", "https://api10-fat.phemex.com");
         hostMap.put("fat1", "https://api10-fat.phemex.com");
         hostMap.put("fat2", "https://api10-fat2.phemex.com");
         hostMap.put("fat3", "https://api10-fat3.phemex.com");

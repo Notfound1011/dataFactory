@@ -9,10 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author: yuyu.shi
@@ -71,17 +68,34 @@ public class MarketDataService {
         String baseUrl = phemexHostMap.get(env);
         String endpoint = "/phemex-user/public/md/v2/kline/list";
 
+        Map<String, Integer> symbolNoDataCount = new HashMap<>(); // 用于跟踪每个symbol没有数据的resolution数量
+        Set<String> symbolsWithNoData = new HashSet<>();
+        Set<String> symbolsWithData = new HashSet<>();
+        for (String symbol : symbolList) {
+            symbolNoDataCount.put(symbol, 0); // 初始化计数
+        }
+
         try {
             for (String symbol : symbolList) {
                 for (int resolution : resolutionList) {
                     String url = baseUrl + endpoint + "?symbol=" + symbol + "&resolution=" + resolution + "&from=" + (endTime - 24 * 60 * 60) + "&to=" + endTime;
-                    System.out.println(url);
                     String response = HttpClientUtil.get(url);
                     JSONObject jsonObject = JSONObject.parseObject(response);
                     JSONArray dataArray = jsonObject.getJSONObject("data").getJSONArray("rows");
                     if (!dataArray.isEmpty()) {
                         validData.computeIfAbsent(symbol, k -> new ArrayList<>()).add(resolution);
+                    } else {
+                        // 如果没有数据，增加该symbol的无数据resolution计数
+                        symbolNoDataCount.put(symbol, symbolNoDataCount.get(symbol) + 1);
                     }
+                }
+            }
+
+            for (Map.Entry<String, Integer> entry : symbolNoDataCount.entrySet()) {
+                if (entry.getValue() == resolutionList.length) {
+                    symbolsWithNoData.add(entry.getKey());
+                }else {
+                    symbolsWithData.add(entry.getKey());
                 }
             }
         } catch (Exception e) {
@@ -90,7 +104,8 @@ public class MarketDataService {
         }
 
         if (!validData.isEmpty()) {
-            return ResultHolder.success("发现有值symbol数量: " + validData.size(), validData);
+            String msg = String.format("发现空值的Symbol: %s,发现有值symbol: %s, ", symbolsWithNoData, symbolsWithData);
+            return ResultHolder.success(msg, validData);
         } else {
             return ResultHolder.error("所有Symbol均未获取到kline数据");
         }

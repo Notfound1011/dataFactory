@@ -95,6 +95,9 @@ public class SpotTradeService {
                 String result = HttpClientUtil.get(url, null, params);
                 JSONObject response = JSONObject.parseObject(result);
                 priceRp = response.getJSONObject("data").getString(indexSymbol);
+                if (priceRp == null) {
+                    priceRp = "1";
+                }
                 log.info("get index success: " + result);
             } catch (Exception e) {
                 log.error("get index failed: ", e);
@@ -193,7 +196,8 @@ public class SpotTradeService {
         spotOrderJson.put("priceEp", priceEp);
         if (baseQtyEv == null && qtyType.equals("ByBase")) {
             BigDecimal quoteQtyDecimal = new BigDecimal(quoteQty);
-            BigDecimal baseQty = quoteQtyDecimal.divide(priceRpDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal("2")).setScale(0, RoundingMode.HALF_UP);;
+            BigDecimal baseQty = quoteQtyDecimal.divide(priceRpDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal("2")).setScale(0, RoundingMode.HALF_UP);
+            ;
             spotOrderJson.put("baseQtyEv", baseQty);
         }
         if (quoteQtyEv == null && qtyType.equals("ByQuote")) {
