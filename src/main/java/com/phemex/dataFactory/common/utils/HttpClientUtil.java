@@ -34,7 +34,7 @@ public class HttpClientUtil {
     private static final int CONNECT_TIMEOUT = 5000;
 
     // 请求获取数据的超时时间(即响应时间)，单位毫秒。
-    private static final int SOCKET_TIMEOUT = 5000;
+    private static final int SOCKET_TIMEOUT = 20000;
 
     private static final RequestConfig requestConfig = RequestConfig.custom()
             .setConnectTimeout(CONNECT_TIMEOUT)

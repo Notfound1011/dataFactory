@@ -26,9 +26,9 @@ import static com.phemex.dataFactory.common.utils.LoadTestCommon.*;
  */
 @Service
 public class LeverageService {
+    private static final Logger log = LoggerFactory.getLogger(LeverageService.class);
     private static final String POSITION_MODE_API_PATH = "/g-positions/switch-pos-mode-sync";
     private static final String LEVERAGE_API_PATH = "/g-positions/leverage";
-    private static final Logger log = LoggerFactory.getLogger(LeverageService.class);
     private final Map<String, String> phemexHostMap;
     private final Map<String, String> phemexPubHostMap;
 

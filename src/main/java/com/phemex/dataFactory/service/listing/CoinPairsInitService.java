@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.phemex.dataFactory.service.listing.CurrencyInitService.getManageToken;
-
 /**
  * @author: yuyu.shi
  * @Project: phemex
@@ -28,14 +26,14 @@ import static com.phemex.dataFactory.service.listing.CurrencyInitService.getMana
 @Service
 public class CoinPairsInitService {
     private static final Logger log = LoggerFactory.getLogger(CoinPairsInitService.class);
-    private static Map<String, String> phemexManageHostMap;
-    private static String accessToken = "NjU0Njk4NzExOTM3OuMgBPBWch9bZRnnuy6NqsCXl3Gq";
-    private static String urlString = "http://bitbucket.cmexpro.com/rest/api/1.0/projects/DEVOPS/repos/config-nacos/raw/golden-copy/DEFAULT_GROUP%40common%40product-cfg.json?at=refs%2Fheads%2FFat";
-    private static final String USER_NAME = "yuyu.shi@cmexpro.com";
-    private static final String PASSWORD = "123456";
+    private final Map<String, String> phemexManageHostMap;
+    private static final String accessToken = "NjU0Njk4NzExOTM3OuMgBPBWch9bZRnnuy6NqsCXl3Gq";
+    private static final String urlString = "http://bitbucket.cmexpro.com/rest/api/1.0/projects/DEVOPS/repos/config-nacos/raw/golden-copy/DEFAULT_GROUP%40common%40product-cfg.json?at=refs%2Fheads%2FFat";
+    private final TokenService tokenService;
 
-    public CoinPairsInitService(Map<String, String> phemexManageHostMap) {
-        CoinPairsInitService.phemexManageHostMap = phemexManageHostMap;
+    public CoinPairsInitService(Map<String, String> phemexManageHostMap, TokenService tokenService) {
+        this.phemexManageHostMap = phemexManageHostMap;
+        this.tokenService = tokenService;
     }
 
     public ResultHolder coinPairsInit(CoinPairsInitRequest coinPairsInitRequest) {
@@ -48,18 +46,12 @@ public class CoinPairsInitService {
         return coinPairsInit(coinPairsInitRequest.getEnv(), coinPairsInitRequest.getMgmtAccount(), codesMap);
     }
 
-
-    public static void main(String[] args) {
-        List<String> symbolList = new ArrayList<>();
-        symbolList.add("sDEFIUSDT");
-        symbolList.add("ETHUSDT");
-        String fileContent = getFileContent(urlString, accessToken);
-        String code = getCodesTypesFromJson(fileContent, symbolList).toString();
-        System.out.println("Code for symbol 'aaa': " + code);
-        StringBuilder result = new StringBuilder();
-        System.out.println(result);
-    }
-
+    /**
+     * @Description: 获取bitbucket文件内容
+     * @Date: 2024/2/27
+     * @Param url: bitbucket的链接
+     * @Param accessToken: bitbucket的token
+     **/
     private static String getFileContent(String url, String accessToken) {
 
         String result;
@@ -73,7 +65,7 @@ public class CoinPairsInitService {
         return result;
     }
 
-
+    // 获取Symbol对应的code
     private static Map<String, Map<String, String>> getCodesTypesFromJson(String jsonString, List<String> symbolList) {
         JSONObject jsonObject = JSONObject.parseObject(jsonString);
         JSONArray products = jsonObject.getJSONArray("products");
@@ -92,7 +84,7 @@ public class CoinPairsInitService {
         return codesAndTypesMap;
     }
 
-
+    // 登录管理后台，初始化币对
     public ResultHolder coinPairsInit(String env, PhemexManageApi phemexManageApi, Map<String, Map<String, String>> codesAndTypesMap) {
         if (env == null || env.isEmpty()) {
             env = "fat2";
@@ -103,7 +95,7 @@ public class CoinPairsInitService {
                 phemexManageApi.getPassword() == null || phemexManageApi.getPassword().isEmpty()) {
             return ResultHolder.error("初始化失败，请先到账号设置 设置管理后台账号！！！");
         }
-        Map<String, String> header = getManageToken(host, phemexManageApi);
+        Map<String, String> header = tokenService.getManageToken(host, phemexManageApi);
 
         List<String> successCurrencies = new ArrayList<>();
         List<String> failedCurrencies = new ArrayList<>();

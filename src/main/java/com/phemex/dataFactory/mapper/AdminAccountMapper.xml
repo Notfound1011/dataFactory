@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.phemex.dataFactory.mapper.MgmtAccountMapper">
-    <resultMap id="MgmtAccountResultMap" type="com.phemex.dataFactory.model.MgmtAccount">
+<mapper namespace="com.phemex.dataFactory.mapper.AdminAccountMapper">
+    <resultMap id="MgmtAccountResultMap" type="com.phemex.dataFactory.model.AdminAccount">
         <id property="id" column="id"/>
         <result property="owner" column="owner"/>
         <result property="username" column="username"/>
         <result property="password" column="password"/>
+        <result property="type" column="type"/>
         <result property="status" column="status"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
     <!-- 插入操作 -->
-    <insert id="insertSelective" parameterType="com.phemex.dataFactory.model.MgmtAccount">
-        INSERT INTO admin_account (owner, username, password, created_at, updated_at)
-        VALUES (#{owner}, #{username}, #{password}, #{createdAt}, #{updatedAt})
+    <insert id="insertSelective" parameterType="com.phemex.dataFactory.model.AdminAccount">
+        INSERT INTO admin_account (owner, username, password, type, created_at, updated_at)
+        VALUES (#{owner}, #{username}, #{password}, #{type}, #{createdAt}, #{updatedAt})
     </insert>
 
     <!-- 更新操作 -->
-    <update id="updateByPrimaryKeySelective" parameterType="com.phemex.dataFactory.model.MgmtAccount">
+    <update id="updateByPrimaryKeySelective" parameterType="com.phemex.dataFactory.model.AdminAccount">
         UPDATE admin_account
         <set>
             <if test="username != null">
@@ -31,12 +32,12 @@
                 updated_at = #{updatedAt},
             </if>
         </set>
-        WHERE owner = #{owner}
+        WHERE owner = #{owner} AND type = #{type}
     </update>
 
     <!-- 根据主键查询 -->
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="MgmtAccountResultMap"
-            resultType="com.phemex.dataFactory.model.MgmtAccount">
+            resultType="com.phemex.dataFactory.model.AdminAccount">
         SELECT *
         FROM admin_account
         WHERE id = #{id}
@@ -44,12 +45,15 @@
 
     <!-- 根据条件查询 -->
     <select id="selectByKey" parameterType="java.lang.String" resultMap="MgmtAccountResultMap"
-            resultType="com.phemex.dataFactory.model.MgmtAccount">
+            resultType="com.phemex.dataFactory.model.AdminAccount">
         SELECT *
         FROM admin_account
         WHERE 1=1
         <if test="owner != null and owner != ''">
             AND owner = #{owner}
+        </if>
+        <if test="type != null and type != ''">
+            AND type = #{type}
         </if>
         <if test="username != null and username != ''">
             AND username = #{username}
@@ -61,9 +65,9 @@
 
     <!-- 根据owner查询 -->
     <select id="selectByOwner" parameterType="java.lang.String" resultMap="MgmtAccountResultMap"
-            resultType="com.phemex.dataFactory.model.MgmtAccount">
+            resultType="com.phemex.dataFactory.model.AdminAccount">
         SELECT *
         FROM admin_account
-        WHERE owner = #{owner}
+        WHERE owner = #{owner} AND type = #{type}
     </select>
 </mapper>

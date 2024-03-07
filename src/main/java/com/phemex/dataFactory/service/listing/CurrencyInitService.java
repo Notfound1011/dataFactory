@@ -3,18 +3,16 @@ package com.phemex.dataFactory.service.listing;
 import com.alibaba.fastjson2.JSONObject;
 import com.phemex.dataFactory.common.utils.HttpClientUtil;
 import com.phemex.dataFactory.request.ResultHolder;
-import com.phemex.dataFactory.request.base.PhemexManageApi;
 import com.phemex.dataFactory.request.listing.CurrencyInfo;
 import com.phemex.dataFactory.request.listing.CurrencyInitRequest;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * @author: yuyu.shi
@@ -26,10 +24,12 @@ import java.util.Map;
 @Service
 public class CurrencyInitService {
     private static final Logger log = LoggerFactory.getLogger(CurrencyInitService.class);
-    private static Map<String, String> phemexManageHostMap;
+    private final Map<String, String> phemexManageHostMap;
+    private final TokenService tokenService;
 
-    public CurrencyInitService(Map<String, String> phemexManageHostMap) {
-        CurrencyInitService.phemexManageHostMap = phemexManageHostMap;
+    public CurrencyInitService(Map<String, String> phemexManageHostMap, TokenService tokenService) {
+        this.phemexManageHostMap = phemexManageHostMap;
+        this.tokenService = tokenService;
     }
 
     public ResultHolder run(CurrencyInitRequest currencyInitRequest) {
@@ -42,7 +42,7 @@ public class CurrencyInitService {
                 currencyInitRequest.getPassword() == null || currencyInitRequest.getPassword().isEmpty()) {
             return ResultHolder.error("初始化失败，请先到账号设置 设置管理后台账号！！！");
         }
-        Map<String, String> header = getManageToken(host, currencyInitRequest);
+        Map<String, String> header = tokenService.getManageToken(host, currencyInitRequest);
 
         List<String> successCurrencies = new ArrayList<>();
         List<String> failedCurrencies = new ArrayList<>();
@@ -89,38 +89,5 @@ public class CurrencyInitService {
             // 部分货币初始化失败
             return ResultHolder.error("Currency initialization failed for: " + String.join(", ", failedCurrencies));
         }
-    }
-
-
-    public static Map<String, String> getManageToken(String host, PhemexManageApi phemexManageApi) {
-        Map<String, String> tokenMap = new HashMap<>();
-        String url = host + "/phemex-admin/phemex-entitlement/login";
-
-        CloseableHttpResponse response;
-        try {
-
-            Map<String, String> header = new HashMap<>();
-            header.put("Accept", "application/json");
-            header.put("Content-type", "application/json");
-
-            Map<String, Object> json = new HashMap<>();
-            json.put("email", phemexManageApi.getUserName());
-            json.put("username", phemexManageApi.getUserName());
-            json.put("password", phemexManageApi.getPassword());
-            json.put("google2fa", "1");
-
-            response = HttpClientUtil.httpPost(url, json, header);
-
-            if (response.getStatusLine().getStatusCode() == 200) {
-                tokenMap.put("phemex-admin-token", response.getFirstHeader("phemex-admin-token").getValue());
-                log.info(tokenMap.toString());
-                return tokenMap;
-            } else {
-                log.error("ManageConfig获取账号信息失败!");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return null;
     }
 }

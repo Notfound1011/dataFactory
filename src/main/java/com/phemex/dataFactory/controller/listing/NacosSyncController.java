@@ -1,15 +1,14 @@
 package com.phemex.dataFactory.controller.listing;
 
 import com.phemex.dataFactory.request.ResultHolder;
+import com.phemex.dataFactory.request.listing.PushNacosRequest;
 import com.phemex.dataFactory.service.listing.NacosSyncService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -25,6 +24,13 @@ import java.util.List;
 public class NacosSyncController {
     @Resource
     private NacosSyncService nacosSyncService;
+
+    @ApiOperation(value = "推送fat环境nacos", notes = "", httpMethod = "POST")
+    @PostMapping("/push-nacos")
+    public ResultHolder pushFatNacos(@RequestBody @Valid PushNacosRequest pushNacosRequest) {
+        return nacosSyncService.pushNacos(pushNacosRequest);
+    }
+
 
     @ApiOperation(value = "同步fat环境nacos", notes = "", httpMethod = "GET")
     @GetMapping("/sync-nacos")

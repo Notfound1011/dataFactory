@@ -176,7 +176,7 @@ public class SpotTradeService {
         Map<String, JSONObject> spotSymbols = productService.getSpotSymbols();
         String quoteQty = spotSymbols.get(symbol).getString("minOrderValueEv");
         Integer priceScale = Integer.parseInt(spotSymbols.get(symbol).getString("priceScale"));
-        Integer quoteQtyPrecision = Integer.parseInt(spotSymbols.get(symbol).getString("quoteQtyPrecision"));
+        Integer pricePrecision = Integer.parseInt(spotSymbols.get(symbol).getString("pricePrecision"));
 
         String timeInForce = Objects.equals(ordType, "Market") ? "ImmediateOrCancel" : "GoodTillCancel";
 
@@ -191,13 +191,12 @@ public class SpotTradeService {
         spotOrderJson.put("timeInForce", timeInForce);
 
         // 根据pricePrecision处理价格，并放大指定倍数
-        BigDecimal priceRpDecimal = new BigDecimal(priceRp).setScale(quoteQtyPrecision, RoundingMode.HALF_UP);
+        BigDecimal priceRpDecimal = new BigDecimal(priceRp).setScale(pricePrecision, RoundingMode.HALF_UP);
         BigDecimal priceEp = priceRpDecimal.multiply(BigDecimal.TEN.pow(priceScale)).setScale(0, RoundingMode.HALF_UP);
         spotOrderJson.put("priceEp", priceEp);
         if (baseQtyEv == null && qtyType.equals("ByBase")) {
             BigDecimal quoteQtyDecimal = new BigDecimal(quoteQty);
             BigDecimal baseQty = quoteQtyDecimal.divide(priceRpDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal("2")).setScale(0, RoundingMode.HALF_UP);
-            ;
             spotOrderJson.put("baseQtyEv", baseQty);
         }
         if (quoteQtyEv == null && qtyType.equals("ByQuote")) {

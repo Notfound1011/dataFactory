@@ -22,7 +22,6 @@ import java.util.*;
 public class MarketDataService {
     private static final Logger log = LoggerFactory.getLogger(MarketDataService.class);
     private final Map<String, String> phemexHostMap;
-
     public MarketDataService(Map<String, String> phemexHostMap) {
         this.phemexHostMap = phemexHostMap;
     }
