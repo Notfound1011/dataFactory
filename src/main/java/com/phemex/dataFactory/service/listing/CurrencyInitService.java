@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,10 +58,22 @@ public class CurrencyInitService {
                 currencyInfo.setAddrExtra(0);
             }
 
-            Map<String, Object> currencyMap = currencyInfo.toMap();
 
             String response;
             try {
+                Map<String, Object> query = new HashMap<>();
+                query.put("currency", currencyInfo.getCurrency());
+                query.put("chain", currencyInfo.getChain());
+                String data = HttpClientUtil.get(url, header, query);
+                JSONObject jsonObject = JSONObject.parseObject(data);
+                Long withdrawFixFeeEv = jsonObject.getJSONObject("data").getLong("withdrawFixFeeEv");
+                Long withdrawMinAmountEv = jsonObject.getJSONObject("data").getLong("withdrawMinAmountEv");
+                currencyInfo.setWithdrawFixFeeEv(withdrawFixFeeEv);
+                currencyInfo.setWithdrawMinAmountEv(withdrawMinAmountEv);
+                Map<String, Object> currencyMap = currencyInfo.toMap();
+
+                log.info("Currency content：{}", currencyMap);
+
                 response = HttpClientUtil.jsonPost(url, currencyMap, header);
                 successCurrencies.add(currencyInfo.getCurrency());
             } catch (Exception e) {

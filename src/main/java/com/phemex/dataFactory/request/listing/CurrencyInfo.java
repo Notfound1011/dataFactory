@@ -28,6 +28,8 @@ public class CurrencyInfo {
     private String depositNotes;
     private int inAssetsDisplay = 1;
     private String tagOrMemo;
+    private Long withdrawFixFeeEv;
+    private Long withdrawMinAmountEv;
 
     // 转换为Map
     public Map<String, Object> toMap() {
@@ -42,6 +44,8 @@ public class CurrencyInfo {
         map.put("addrExtra", this.addrExtra);
         map.put("depositNotes", this.depositNotes);
         map.put("inAssetsDisplay", this.inAssetsDisplay);
+        map.put("withdrawFixFeeEv", this.withdrawFixFeeEv);
+        map.put("withdrawMinAmountEv", this.withdrawMinAmountEv);
         map.put("tagOrMemo", this.tagOrMemo);
         return map;
     }
