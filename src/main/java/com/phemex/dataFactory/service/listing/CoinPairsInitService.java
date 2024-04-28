@@ -3,8 +3,9 @@ package com.phemex.dataFactory.service.listing;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.phemex.dataFactory.common.utils.HttpClientUtil;
+import com.phemex.dataFactory.model.AdminAccount;
 import com.phemex.dataFactory.request.ResultHolder;
-import com.phemex.dataFactory.request.base.PhemexManageApi;
+import com.phemex.dataFactory.request.base.PhemexAdminApi;
 import com.phemex.dataFactory.request.listing.CoinPairsInitRequest;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 
 /**
  * @author: yuyu.shi
@@ -30,10 +32,14 @@ public class CoinPairsInitService {
     private static final String accessToken = "NjU0Njk4NzExOTM3OuMgBPBWch9bZRnnuy6NqsCXl3Gq";
     private static final String urlString = "http://bitbucket.cmexpro.com/rest/api/1.0/projects/DEVOPS/repos/config-nacos/raw/golden-copy/DEFAULT_GROUP%40common%40product-cfg.json?at=refs%2Fheads%2FFat";
     private final TokenService tokenService;
+    private final OpsysService opsysService;
+    private final AdminAccountService adminAccountService;
 
-    public CoinPairsInitService(Map<String, String> phemexManageHostMap, TokenService tokenService) {
+    public CoinPairsInitService(Map<String, String> phemexManageHostMap, TokenService tokenService, OpsysService opsysService, AdminAccountService adminAccountService) {
         this.phemexManageHostMap = phemexManageHostMap;
         this.tokenService = tokenService;
+        this.opsysService = opsysService;
+        this.adminAccountService = adminAccountService;
     }
 
     public ResultHolder coinPairsInit(CoinPairsInitRequest coinPairsInitRequest) {
@@ -43,7 +49,7 @@ public class CoinPairsInitService {
         Map<String, Map<String, String>> codesMap;
         codesMap = getCodesTypesFromJson(fileContent, coinPairsInitRequest.getSymbolList());
 
-        return coinPairsInit(coinPairsInitRequest.getEnv(), coinPairsInitRequest.getMgmtAccount(), codesMap);
+        return coinPairsInit(coinPairsInitRequest.getEnv(), coinPairsInitRequest.getMgmtAccount(), coinPairsInitRequest.getLdapAccount(), codesMap);
     }
 
     /**
@@ -85,77 +91,100 @@ public class CoinPairsInitService {
     }
 
     // 登录管理后台，初始化币对
-    public ResultHolder coinPairsInit(String env, PhemexManageApi phemexManageApi, Map<String, Map<String, String>> codesAndTypesMap) {
+    public ResultHolder coinPairsInit(String env, PhemexAdminApi mgmtAccount, PhemexAdminApi ldapAccount, Map<String, Map<String, String>> codesAndTypesMap) {
         if (env == null || env.isEmpty()) {
             env = "fat2";
         }
         String host = phemexManageHostMap.get(env);
+        AdminAccount adminAccount = adminAccountService.getAdminAccount(mgmtAccount.getOwner(), mgmtAccount.getAccountType());
 
-        if (phemexManageApi.getUserName() == null || phemexManageApi.getUserName().isEmpty() ||
-                phemexManageApi.getPassword() == null || phemexManageApi.getPassword().isEmpty()) {
+        if (adminAccount.getUsername() == null || adminAccount.getUsername().isEmpty() ||
+                adminAccount.getPassword() == null || adminAccount.getPassword().isEmpty()) {
             return ResultHolder.error("初始化失败，请先到账号设置 设置管理后台账号！！！");
         }
-        Map<String, String> header = tokenService.getManageToken(host, phemexManageApi);
+        Map<String, String> header = tokenService.getManageToken(host, mgmtAccount);
 
-        List<String> successCurrencies = new ArrayList<>();
-        List<String> failedCurrencies = new ArrayList<>();
+        List<String> successCoinPairs = new ArrayList<>();
+        List<String> failedCoinPairs = new ArrayList<>();
         boolean allSuccess = true;
 
-        // 遍历Map, 数据格式为{ETHUSDT={code=41641, type=PerpetualV2}}
+        ExecutorService executor = Executors.newFixedThreadPool(codesAndTypesMap.size());
+        List<Future<ResultHolder>> futures = new ArrayList<>();
+
         for (String key : codesAndTypesMap.keySet()) {
-            Map<String, String> value = codesAndTypesMap.get(key);
-            String type = value.get("type");
-            String code = value.get("code");
+            futures.add(executor.submit(() -> {
+                Map<String, String> value = codesAndTypesMap.get(key);
+                String type = value.get("type");
+                String code = value.get("code");
 
-            long timestamp = System.currentTimeMillis();
-            String path = null;
-            String jsonString = null;
-            if (type.equals("PerpetualV2")) {
-                path = "/phemex-admin/phemex-common-service/admin/coin-pairs/contract/edit";
-                jsonString = String.format(
-                        "{\"displayTime\":%d,\"listTime\":%d,\"alertTime\":0,\"deListTime\":0,\"hideTime\":0,\"internalDisplayTime\":%d,\"internalListTime\":%d,\"internalAlertTime\":0,\"internalDeListTime\":0,\"internalHideTime\":0,\"pairCode\":\"%s\",\"type\":\"PerpetualV2\",\"settleCurrency\":\"USDT\"}",
-                        timestamp, timestamp, timestamp, timestamp, code);
-            } else if (type.equals("Spot")) {
-                path = "/phemex-admin/phemex-common-service/admin/coin-pairs/spot/edit";
-                jsonString = String.format(
-                        "{\"displayTime\":%d,\"listTime\":%d,\"alertTime\":0,\"deListTime\":0,\"hideTime\":0,\"internalDisplayTime\":%d,\"internalListTime\":%d,\"internalAlertTime\":0,\"internalDeListTime\":0,\"internalHideTime\":0,\"stStatus\":0,\"pairCode\":\"%s\"}",
-                        timestamp, timestamp, timestamp, timestamp, code);
+                long timestamp = System.currentTimeMillis();
+                String path = null;
+                String jsonString = null;
+                if (type.equals("PerpetualV2")) {
+                    path = "/phemex-admin/phemex-common-service/admin/coin-pairs/contract/edit";
+                    jsonString = String.format(
+                            "{\"displayTime\":%d,\"listTime\":%d,\"alertTime\":0,\"deListTime\":0,\"hideTime\":0,\"internalDisplayTime\":%d,\"internalListTime\":%d,\"internalAlertTime\":0,\"internalDeListTime\":0,\"internalHideTime\":0,\"pairCode\":\"%s\",\"type\":\"PerpetualV2\",\"settleCurrency\":\"USDT\"}",
+                            timestamp, timestamp, timestamp, timestamp, code);
+                } else if (type.equals("Spot")) {
+                    path = "/phemex-admin/phemex-common-service/admin/coin-pairs/spot/edit";
+                    jsonString = String.format(
+                            "{\"displayTime\":%d,\"listTime\":%d,\"alertTime\":0,\"deListTime\":0,\"hideTime\":0,\"internalDisplayTime\":%d,\"internalListTime\":%d,\"internalAlertTime\":0,\"internalDeListTime\":0,\"internalHideTime\":0,\"stStatus\":0,\"pairCode\":\"%s\"}",
+                            timestamp, timestamp, timestamp, timestamp, code);
+                }
+
+                String url = host + path;
+                try {
+                    String response = HttpClientUtil.jsonPost(url, jsonString, header);
+                    JSONObject.parseObject(response);
+
+                    log.info("Response for initializing coin pair {}: {}", key, response);
+                    return ResultHolder.success("Coin pair initialized successfully: " + key);
+                } catch (Exception e) {
+                    log.error("Failed to initialize coin pair: " + key, e);
+                    return ResultHolder.error("Failed to initialize coin pair: " + key);
+                }
+            }));
+        }
+
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
             }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+            return ResultHolder.error("初始化失败，线程被中断。");
+        }
 
-            String url = host + path;
-
-            String response;
+        for (Future<ResultHolder> future : futures) {
             try {
-                response = HttpClientUtil.jsonPost(url, jsonString, header);
-                successCurrencies.add(key);
-            } catch (Exception e) {
-                log.error("Failed to initialize coin pair: " + key, e);
-                failedCurrencies.add(key);
+                ResultHolder result = future.get();
+                if (!result.isSuccess()) {
+                    allSuccess = false;
+                    failedCoinPairs.add(result.getMessage());
+                } else {
+                    successCoinPairs.add((String) result.getData());
+                }
+            } catch (InterruptedException | ExecutionException e) {
                 allSuccess = false;
-                continue; // Skip to the next currency
-            }
-
-            log.info("Response for initializing coin pair {}: {}", key, response);
-            JSONObject jsonObject = JSONObject.parseObject(response);
-
-            if (jsonObject.getString("code").equals("401")) {
-                return ResultHolder.error("初始化失败，管理后台账号账号或密码不正确！！！");
-            } else if (!jsonObject.getString("code").equals("0")) {
-                log.error("coin pair initialization failed for {}: {}", key, jsonObject);
-                failedCurrencies.add(key);
-                allSuccess = false;
+                log.error("Exception occurred during coin pair initialization.", e);
             }
         }
 
         ResultHolder updateToGateway = updateToGateway(codesAndTypesMap, host, header);
         if (updateToGateway != null) return updateToGateway;
 
+        ResultHolder refreshCDN = opsysService.refreshCDN(ldapAccount);
+        if (refreshCDN != null) return refreshCDN;
+
+
         if (allSuccess) {
-            // 所有币对初始化成功
-            return ResultHolder.success("All coin pairs initialized successfully", String.join(", ", successCurrencies));
+            String successMessage = "All coin pairs initialized successfully";
+            return ResultHolder.success(successMessage, successCoinPairs);
         } else {
-            // 部分币对初始化失败
-            return ResultHolder.error("coin pairs initialization failed for: " + String.join(", ", failedCurrencies));
+            String errorMessage = "Some coin pairs initialization failed";
+            return ResultHolder.error(errorMessage, failedCoinPairs);
         }
     }
 

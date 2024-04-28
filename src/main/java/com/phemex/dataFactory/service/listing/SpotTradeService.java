@@ -90,7 +90,7 @@ public class SpotTradeService {
             params.put("getAll", "false");
             params.put("env", env);
             String priceRp;
-            String url = "http://" + serviceUrl + ":6200/public/test-data/tools/get-index-price";
+            String url = "http://" + serviceUrl + ":6200/public/test-data/tools/phemex/get-index-price";
             try {
                 String result = HttpClientUtil.get(url, null, params);
                 JSONObject response = JSONObject.parseObject(result);

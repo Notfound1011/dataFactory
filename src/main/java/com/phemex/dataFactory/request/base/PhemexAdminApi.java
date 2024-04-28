@@ -10,7 +10,7 @@ import lombok.Data;
  * @Description:
  */
 @Data
-public class PhemexManageApi {
-    private String userName;
-    private String password;
+public class PhemexAdminApi {
+    private String owner;
+    private String accountType;
 }

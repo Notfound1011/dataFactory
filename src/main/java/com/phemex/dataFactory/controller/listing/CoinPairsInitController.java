@@ -28,7 +28,7 @@ public class CoinPairsInitController {
     @Resource
     private CoinPairsInitService coinPairsInitService;
 
-    @ApiOperation(value = "pub api开仓", notes = "", httpMethod = "POST")
+    @ApiOperation(value = "合约现货币对初始化", notes = "", httpMethod = "POST")
     @PostMapping("/admin/api/coin-pairs-init")
     public ResultHolder openPositionPubApi(@RequestBody @Valid CoinPairsInitRequest coinPairsInitRequest) {
         return coinPairsInitService.coinPairsInit(coinPairsInitRequest);

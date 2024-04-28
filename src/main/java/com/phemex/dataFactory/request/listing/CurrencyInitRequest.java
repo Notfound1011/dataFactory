@@ -1,9 +1,10 @@
 package com.phemex.dataFactory.request.listing;
 
-import com.phemex.dataFactory.request.base.PhemexManageApi;
+import com.phemex.dataFactory.request.base.PhemexAdminApi;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,15 +19,19 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class CurrencyInitRequest extends PhemexManageApi{
+public class CurrencyInitRequest {
     private String env;
     private List<CurrencyInfo> currencies;
+    @Valid
+    private PhemexAdminApi mgmtAccount;
+    @Valid
+    private PhemexAdminApi ldapAccount;
 
     // 转换为Map
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("env", this.env);
-        map.put("currencies",currencies);
+        map.put("currencies", currencies);
         return map;
     }
 }

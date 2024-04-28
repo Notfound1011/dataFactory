@@ -1,7 +1,10 @@
 package com.phemex.dataFactory.request.listing;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.phemex.dataFactory.request.base.PhemexAdminApi;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author: yuyu.shi
@@ -11,7 +14,10 @@ import lombok.Data;
  * @Description:
  */
 @Data
-public class PushNacosRequest extends PhemexAdminApi {
+public class ListFlowRequest extends PhemexAdminApi {
+    private String cmdb_environments;
     private String description;
-    private String filter;
+    private List<JSONObject> params;
+    private String type;
+    private String env;
 }

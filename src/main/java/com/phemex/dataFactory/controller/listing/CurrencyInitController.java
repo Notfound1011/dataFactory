@@ -27,7 +27,7 @@ public class CurrencyInitController {
     @Resource
     private CurrencyInitService currencyInitService;
 
-    @ApiOperation(value = "pub api开仓", notes = "", httpMethod = "POST")
+    @ApiOperation(value = "currency初始化", notes = "", httpMethod = "POST")
     @PostMapping("/admin/api/currency-init")
     public ResultHolder openPositionPubApi(@RequestBody @Valid CurrencyInitRequest currencyInitRequest) throws Exception {
         return currencyInitService.run(currencyInitRequest);

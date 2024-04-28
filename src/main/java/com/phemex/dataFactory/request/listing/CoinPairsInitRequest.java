@@ -1,6 +1,6 @@
 package com.phemex.dataFactory.request.listing;
 
-import com.phemex.dataFactory.request.base.PhemexManageApi;
+import com.phemex.dataFactory.request.base.PhemexAdminApi;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,8 +22,9 @@ public class CoinPairsInitRequest {
     private String env;
 
     @Valid
-    private PhemexManageApi mgmtAccount;
-
+    private PhemexAdminApi mgmtAccount;
+    @Valid
+    private PhemexAdminApi ldapAccount;
     @NotEmpty
     private List<String> symbolList;
 }
