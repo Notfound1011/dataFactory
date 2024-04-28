@@ -211,6 +211,8 @@ public class OpsysService {
             if ("1".equals(jsonObject.getString("status"))) {
                 log.info("create list flow success: {}", jsonObject);
                 return ResultHolder.success("create list flow success");
+            } else {
+                return ResultHolder.error("create list flow failed: " + jsonObject.get("msg"), jsonObject.get("data"));
             }
         } catch (Exception e) {
             log.error("Failed to create list flow: ", e);
