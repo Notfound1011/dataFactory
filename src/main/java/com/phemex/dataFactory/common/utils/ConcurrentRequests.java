@@ -30,8 +30,8 @@ import static com.phemex.dataFactory.common.utils.PspMintBatch.*;
  * @Description:
  */
 public class ConcurrentRequests {
-    private static final int NUM_USERS = 50;
-    private static final int CONCURRENT_ACCESS = 50;
+    private static final int NUM_USERS = 1;
+    private static final int CONCURRENT_ACCESS = 20;
 
 
     public static void main(String[] args) throws IOException {
@@ -41,6 +41,17 @@ public class ConcurrentRequests {
         String outputFilePath = "src/main/resources/output/tokens.txt";
         executeConcurrentRequests(inputFilePath, methodName, outputFilePath);
 
+//        // orders: 读取tokens,执行并发orders请求
+//        String inputFilePath = "src/main/resources/output/tokens.txt";
+//        String methodName = "orders";
+//        String outputFilePath = "src/main/resources/output/orders.txt";
+//        executeConcurrentRequests(inputFilePath, methodName, outputFilePath);
+
+        // cancel: 读取tokens,执行并发cancel请求
+//        String inputFilePath = "src/main/resources/output/tokens.txt";
+//        String methodName = "cancelAllAfter";
+//        String outputFilePath = "src/main/resources/output/cancelAllAfter.txt";
+//        executeConcurrentRequests(inputFilePath, methodName, outputFilePath);
 
         // stake: 读取tokens,执行并发stake请求
 //        String inputFilePath = "src/main/resources/output/tokens.txt";
@@ -150,6 +161,18 @@ class RequestTask implements Runnable {
                     writer.flush();
                     break;
                 }
+                case "orders": {
+                    String result = orders(param);
+                    writer.write(result + "\n");
+                    writer.flush();
+                    break;
+                }
+                case "cancelAllAfter": {
+                    String result = cancelAllAfter(param);
+                    writer.write(result + "\n");
+                    writer.flush();
+                    break;
+                }
                 case "stake": {
                     String result = stake(param);
                     writer.write(result + "\n");
@@ -175,7 +198,7 @@ class RequestTask implements Runnable {
 
 
             // 模拟请求的耗时
-            Thread.sleep(100);
+            Thread.sleep(1000);
 
             // 打印请求结束时间
             System.out.println("End Time: " + getCurrentTime());

@@ -16,7 +16,7 @@ import static com.phemex.dataFactory.common.utils.LoadTestCommon.getHeader;
  */
 public class CopyTraderBatch {
     public static void main(String[] args) throws Exception {
-//        application();  // 成为copier、划转
+        application();  // 成为copier、划转
 //        copySettings();  // 跟单
     }
 
@@ -46,11 +46,12 @@ public class CopyTraderBatch {
 
 
                 HashMap<String, Object> transferBody = new HashMap<>();
-                transferBody.put("amountEv", "10000000000000");
-                transferBody.put("amount", "100000");
+                transferBody.put("amountEv", "10000000000");
+                transferBody.put("amount", "100.00000000");
                 transferBody.put("currency", "USDT");
                 transferBody.put("fromAccType", "SPOT");
-                transferBody.put("toAccType", "COPY_TRADE");
+                transferBody.put("toAccType", "CONTRACT");
+//                transferBody.put("toAccType", "COPY_TRADE");
 
                 String resTransfer = HttpClientUtil.jsonPost("https://api10-fat.phemex.com/exchanger-core/wallets/account/transfer", transferBody, header);
                 JSONObject jsonResTransfer = JSONObject.parseObject(resTransfer);

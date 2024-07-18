@@ -195,7 +195,7 @@ public class LoadTestCommon {
         Result result = getResult(header, email, password);
         String url = "https://api10-fat2.phemex.com/phemex-user/users/confirm/login" + "?code=" + result.code + "&mailCode=111111";
         CloseableHttpResponse res = HttpClientUtil.httpGet(url, header);
-        System.out.println(EntityUtils.toString(res.getEntity()));
+//        System.out.println(EntityUtils.toString(res.getEntity()));
         String responseHeader = res.getFirstHeader("phemex-auth-token").getValue();
 
         return new TokenInfo(result.body, responseHeader);
@@ -232,6 +232,7 @@ public class LoadTestCommon {
 
         String res = HttpClientUtil.jsonPost("https://api10-fat2.phemex.com/phemex-user/users/login", body, header);
         JSONObject json_res = JSONObject.parseObject(res);
+        System.out.println(res);
         String code = json_res.getJSONObject("data").getString("code");
         Result result = new Result(body, code);
         return result;

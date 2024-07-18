@@ -31,9 +31,9 @@ public class OpsysService {
     private static final Logger log = LoggerFactory.getLogger(OpsysService.class);
     private static final String accessToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuYWNvcyIsImV4cCI6MTY5MDg3ODE5Nn0.0tz2Vh9fU4YXyGKWBLZNnaT_JSDmn_YUg0AofCGfa8o";
     private static final String urlTemplate = "http://alb-sap-nacos-424928052.ap-southeast-1.elb.amazonaws.com/nacos/v1/cs/configs?clone=true&tenant=%s&policy=OVERWRITE&namespaceId=&accessToken=" + accessToken;
-    private static final String diffListPath = "/opsys/ncm/batch_nacos_data/diff_list/?env_key=Fat";
-    private static final String createBatchUpdatePath = "/opsys/ncm/batch_nacos_data/";
-    private static final String getNacosListPath = "/opsys/ncm/batch_nacos_data/?page=1&page_size=15&cmdb_environments__key=Fat";
+    private static final String diffListPath = "/opsys/1ncm/batch_nacos_data/diff_list/?env_key=Fat";
+    private static final String createBatchUpdatePath = "/opsys/1ncm/batch_nacos_data/";
+    private static final String getNacosListPath = "/opsys/1ncm/batch_nacos_data/?page=1&page_size=15&cmdb_environments__key=Fat";
     private static final String ListFlowPath = "/opsys/cd2/flow/";
     private static final String CDNPath = "/opsys/tools/cloudfront_record/";
     private final String phemexOpsysHost = "http://opsys.cmex.corp";
@@ -47,7 +47,7 @@ public class OpsysService {
 
     public ResultHolder syncFatNacos(List<String> envs) {
         StringBuilder result = new StringBuilder();
-        String body = "[{\"cfgId\":\"31978\",\"dataId\":\"common:phemex-spot-cfg-internal-gateway\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"31979\",\"dataId\":\"common:phemex-spot-cfg-gateway\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"31980\",\"dataId\":\"common:phemex-spot-cfg-app\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"31981\",\"dataId\":\"common:phemex-cfg-internal-gateway\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"31982\",\"dataId\":\"common:phemex-cfg-gateway\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"31983\",\"dataId\":\"common:phemex-cfg-app\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"31984\",\"dataId\":\"common:contractTrading-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"31985\",\"dataId\":\"common:chain-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"47596\",\"dataId\":\"common:phemex-contract-cfg-app\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"48256\",\"dataId\":\"common:phemex-contract-cfg-gateway\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"48258\",\"dataId\":\"common:phemex-contract-cfg-internal-gateway\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"50636\",\"dataId\":\"common:index-products\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"57520\",\"dataId\":\"common:engineGray-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"58282\",\"dataId\":\"common:rftEngine-shard-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"58283\",\"dataId\":\"common:engine-shard-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"160724\",\"dataId\":\"common:phemex-kafka-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"237441\",\"dataId\":\"common:margin-shard-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"251949\",\"dataId\":\"common:phemex-robot-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"264593\",\"dataId\":\"common:contract-engine-shard-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"286407\",\"dataId\":\"common:phemex-geo-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"358562\",\"dataId\":\"common:spot-wallet-check-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"386674\",\"dataId\":\"common:phemex-cfg-currency\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"423197\",\"dataId\":\"common:index\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"429178\",\"dataId\":\"common:product-cfg-misc\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"503444\",\"dataId\":\"common:behaviorTrackerConfig\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"533710\",\"dataId\":\"common:product-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"539261\",\"dataId\":\"common:phemex-oauth2-gateway\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"553694\",\"dataId\":\"common:seq-clients-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"584675\",\"dataId\":\"common:uta-margin-shard-cfg\",\"group\":\"DEFAULT_GROUP\"}]";
+        String body = "[{\"cfgId\":\"31978\",\"dataId\":\"common:phemex-spot-cfg-internal-gateway\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"31979\",\"dataId\":\"common:phemex-spot-cfg-gateway\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"31980\",\"dataId\":\"common:phemex-spot-cfg-app\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"31981\",\"dataId\":\"common:phemex-cfg-internal-gateway\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"31982\",\"dataId\":\"common:phemex-cfg-gateway\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"31983\",\"dataId\":\"common:phemex-cfg-app\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"31984\",\"dataId\":\"common:contractTrading-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"31985\",\"dataId\":\"common:chain-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"47596\",\"dataId\":\"common:phemex-contract-cfg-app\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"48256\",\"dataId\":\"common:phemex-contract-cfg-gateway\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"48258\",\"dataId\":\"common:phemex-contract-cfg-internal-gateway\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"50636\",\"dataId\":\"common:index-products\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"57520\",\"dataId\":\"common:engineGray-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"58282\",\"dataId\":\"common:rftEngine-shard-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"58283\",\"dataId\":\"common:engine-shard-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"160724\",\"dataId\":\"common:phemex-kafka-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"237441\",\"dataId\":\"common:margin-shard-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"251949\",\"dataId\":\"common:phemex-robot-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"264593\",\"dataId\":\"common:contract-engine-shard-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"286407\",\"dataId\":\"common:phemex-geo-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"358562\",\"dataId\":\"common:spot-wallet-check-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"386674\",\"dataId\":\"common:phemex-cfg-currency\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"423197\",\"dataId\":\"common:index\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"429178\",\"dataId\":\"common:product-cfg-misc\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"533710\",\"dataId\":\"common:product-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"539261\",\"dataId\":\"common:phemex-oauth2-gateway\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"553694\",\"dataId\":\"common:seq-clients-cfg\",\"group\":\"DEFAULT_GROUP\"},{\"cfgId\":\"584675\",\"dataId\":\"common:uta-margin-shard-cfg\",\"group\":\"DEFAULT_GROUP\"}]";
 
         for (String env : envs) {
             String url = String.format(urlTemplate, env);
@@ -91,12 +91,20 @@ public class OpsysService {
             log.error("get diff_list failed for : {}", diffListJsonObject);
             return ResultHolder.error("获取diff列表失败！");
         }
-
         log.info("get diff_list success for : {}", diffListJsonObject);
-        JSONArray filteredFiles = filterFilesByDataId(diffListJsonObject.getJSONObject("data").getJSONArray("files"));
+
+        JSONArray files = diffListJsonObject.getJSONObject("data").getJSONArray("files");
+        JSONArray filteredFiles = new JSONArray();
+        for (int i = 0; i < files.size(); i++) {
+            JSONObject file = files.getJSONObject(i);
+            if ("golden-copy".equals(file.getString("gitpath"))) {
+                filteredFiles.add(file);
+            }
+        }
         if (filteredFiles.isEmpty()) {
             return ResultHolder.error("没有获取到diff内容，请确认PR是否合并!");
         }
+        log.info("get filtered files success for : {}", filteredFiles);
 
         JSONObject createBatchUpdateBody = createBatchUpdateBody(pushNacosRequest.getDescription(), filteredFiles);
         JSONObject createBatchUpdateJsonObject = createBatchUpdate(header, createBatchUpdateBody);
@@ -170,7 +178,7 @@ public class OpsysService {
     }
 
     private ResultHolder pushToNacos(Map<String, String> header) {
-        String url = phemexOpsysHost + "/opsys/ncm/batch_nacos_data/" + getNacosDeployId(header) + "/values/";
+        String url = phemexOpsysHost + "/opsys/1ncm/batch_nacos_data/" + getNacosDeployId(header) + "/values/";
         try {
             String response = HttpClientUtil.jsonPost(url, header);
             JSONObject jsonObject = JSONObject.parseObject(response);

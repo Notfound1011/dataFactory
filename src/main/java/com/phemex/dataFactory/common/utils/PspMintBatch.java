@@ -5,6 +5,7 @@ import com.phemex.dataFactory.request.UserRegisterRequest;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.UUID;
 
 import static com.phemex.dataFactory.common.utils.EthereumWalletGenerator.genWalletAddress;
 import static com.phemex.dataFactory.common.utils.LoadTestCommon.*;
@@ -149,6 +150,63 @@ public class PspMintBatch {
         JSONObject jsonResStake = JSONObject.parseObject(resStake);
         System.out.println("stake结果" + jsonResStake);
         return jsonResStake.toString();
+    }
+
+    /**
+     * @return String
+     * @Description: g-orders
+     * @Date: 2024/6/4
+     * @Param token:
+     */
+    public static String orders(String token) throws Exception {
+        // 设置请求头
+        HashMap<String, String> header = getHeader();
+        header.put("phemex-auth-token", token);
+
+        HashMap<String, Object> stakeBody = new HashMap<>();
+        stakeBody.put("actionBy", "FromOrderPlacement");
+        stakeBody.put("symbol", "BTCUSDT");
+        stakeBody.put("side", "Buy");
+        stakeBody.put("reduceOnly", false);
+        stakeBody.put("ordType", "Limit");
+        stakeBody.put("timeInForce", "GoodTillCancel");
+        stakeBody.put("orderQtyRq", "0.001");
+        stakeBody.put("displayQtyRq", "0.001");
+        stakeBody.put("priceRp", "60000.0");
+        stakeBody.put("stopPxRp", "0.0");
+        stakeBody.put("posSide", "Long");
+        stakeBody.put("takeProfitRp", "0.0");
+        stakeBody.put("stopLossRp", "0.0");
+        stakeBody.put("clOrdID", UUID.randomUUID());
+
+        // 打印请求开始时间
+        System.out.println("Start Time: " + getCurrentTime());
+        String resOrders = HttpClientUtil.jsonPost("https://api10-fat2.phemex.com/g-orders", stakeBody, header);
+        JSONObject jsonResOrders = JSONObject.parseObject(resOrders);
+        System.out.println("g-orders结果" + jsonResOrders);
+        return jsonResOrders.toString();
+    }
+
+    /**
+     * @return String
+     * @Description: cancel-all-after
+     * @Date: 2024/6/4
+     * @Param token:
+     */
+    public static String cancelAllAfter(String token) throws Exception {
+        // 设置请求头
+        HashMap<String, String> header = getHeader();
+        header.put("phemex-auth-token", token);
+
+        HashMap<String, Object> stakeBody = new HashMap<>();
+        stakeBody.put("timeout", "60");
+
+        // 打印请求开始时间
+//        System.out.println("Start Time: " + getCurrentTime());
+        String resCancel = HttpClientUtil.jsonPost("https://api10-fat2.phemex.com/contract-biz/api/trade/cancel-all-after", stakeBody, header);
+        JSONObject jsonResCancel = JSONObject.parseObject(resCancel);
+//        System.out.println("cancel-all-after结果" + jsonResCancel);
+        return jsonResCancel.toString();
     }
 
 
